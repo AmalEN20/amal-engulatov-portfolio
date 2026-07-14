@@ -284,7 +284,7 @@ a:hover .ui-window { transform: scale(1.025) rotate(-.5deg); }
 .intro-word-mask { position: relative; z-index: 2; display: grid; width: 100%; height: min(34vh, 330px); place-items: center; overflow: hidden; isolation: isolate; }
 .intro-loader-word { position: absolute; z-index: 4; display: block; width: 100%; color: white; font-size: clamp(30px, 4.42vw, 70px); font-weight: 500; line-height: .92; letter-spacing: -.045em; text-align: center; text-shadow: 0 14px 55px rgba(5,20,75,.16); transform-origin: center; will-change: transform, opacity; }
 .intro-final-ai { display: inline-block; transform-origin: center; }
-.intro-final-agents { display: inline-block; max-width: 5.5em; margin-bottom: -.12em; margin-left: .22em; padding-bottom: .12em; overflow: hidden; white-space: nowrap; line-height: 1.05; vertical-align: baseline; transform-origin: left center; will-change: max-width, opacity, transform, clip-path; }
+.intro-final-agents { display: inline-block; max-width: 5.5em; margin-bottom: -.14em; margin-left: .22em; padding-bottom: .14em; overflow: hidden; white-space: nowrap; line-height: .92; vertical-align: bottom; transform-origin: left center; will-change: max-width, opacity, transform, clip-path; }
 .intro-loader-grid, .intro-loader-orbit, .intro-company-cloud { transition: opacity .58s cubic-bezier(.22,1,.36,1), transform .68s cubic-bezier(.22,1,.36,1), filter .48s ease; }
 .intro-loader-inner { transition: opacity .3s ease, transform .5s cubic-bezier(.22,1,.36,1), filter .3s ease; }
 .intro-loader.intro-exiting { background: transparent; }
