@@ -161,7 +161,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
     const isIntroExitReveal = introActive && introExiting;
     if (isIntroExitReveal) introRevealStarted.current = true;
-    const revealDelay = 0;
+    const revealDelay = pageRevealPending.current ? 160 : 0;
     let context: gsap.Context | undefined;
     const animationTimer = window.setTimeout(() => {
       window.scrollTo(0, 0);
