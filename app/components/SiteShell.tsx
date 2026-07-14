@@ -98,8 +98,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       window.setTimeout(() => setIntroIndex(index + 1), step * (index + 1)),
     );
     const aiOnlyTimer = window.setTimeout(() => setIntroAiOnly(true), finalItemAt + 430);
-    const exitTimer = window.setTimeout(() => setIntroExiting(true), finalItemAt + 1030);
-    const finishTimer = window.setTimeout(() => setIntroActive(false), finalItemAt + 1850);
+    const exitTimer = window.setTimeout(() => setIntroExiting(true), finalItemAt + 930);
+    const finishTimer = window.setTimeout(() => setIntroActive(false), finalItemAt + 1750);
     return () => {
       itemTimers.forEach((timer) => window.clearTimeout(timer));
       window.clearTimeout(aiOnlyTimer);
