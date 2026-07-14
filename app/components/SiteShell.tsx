@@ -337,15 +337,19 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <motion.div className="menu-overlay" initial={false} animate={{ pointerEvents: "auto" }}>
             <motion.button className="menu-backdrop" aria-label="Close navigation" onClick={() => setMenuOpen(false)}>
               <span className="menu-backdrop-curtains" aria-hidden="true">
-                {Array.from({ length: 5 }, (_, panel) => (
-                  <motion.i
-                    key={panel}
-                    initial={{ scaleY: 0 }}
-                    animate={{ scaleY: 1 }}
-                    exit={{ scaleY: 0 }}
-                    transition={{ delay: (4 - panel) * 0.055, duration: 0.36, ease: [0.76, 0, 0.24, 1] }}
-                  />
-                ))}
+                {Array.from({ length: 16 }, (_, block) => {
+                  const row = Math.floor(block / 4);
+                  const column = block % 4;
+                  const revealOrder = (3 - row) * 4 + column;
+                  return (
+                    <motion.i
+                      key={block}
+                      initial={{ clipPath: "inset(100% 100% 0 0)" }}
+                      animate={{ clipPath: "inset(0% 0% 0 0)", transition: { delay: revealOrder * 0.035, duration: 0.22, ease: [0.76, 0, 0.24, 1] } }}
+                      exit={{ clipPath: "inset(100% 100% 0 0)", transition: { delay: (15 - revealOrder) * 0.018, duration: 0.18, ease: [0.76, 0, 0.24, 1] } }}
+                    />
+                  );
+                })}
               </span>
             </motion.button>
             <motion.nav
