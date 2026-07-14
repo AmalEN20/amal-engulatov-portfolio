@@ -241,7 +241,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               {aiCompanies.map((company) => <span key={company}>{company}</span>)}
             </div>
             <div className="container-shell intro-loader-inner">
-              <div className="intro-loader-meta"><span className="eyebrow">Amal Engulatov / AI Software Engineer</span><span className="eyebrow">{String(introIndex + 1).padStart(2, "0")} / {String(introItems.length).padStart(2, "0")}</span></div>
+              <div className="intro-loader-meta"><span className="eyebrow">Amal Engulatov / AI Software Engineer</span></div>
               <div className="intro-word-mask">
                 <AnimatePresence initial={false}>
                   <motion.span
@@ -336,20 +336,15 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         {menuOpen && (
           <motion.div className="menu-overlay" initial={false} animate={{ pointerEvents: "auto" }}>
             <motion.button className="menu-backdrop" aria-label="Close navigation" onClick={() => setMenuOpen(false)}>
-              <span className="menu-backdrop-curtains" aria-hidden="true">
-                {Array.from({ length: 16 }, (_, block) => {
-                  const row = Math.floor(block / 4);
-                  const column = block % 4;
-                  const revealOrder = (3 - row) * 4 + column;
-                  return (
-                    <motion.i
-                      key={block}
-                      initial={{ clipPath: "inset(100% 100% 0 0)" }}
-                      animate={{ clipPath: "inset(0% 0% 0 0)", transition: { delay: revealOrder * 0.035, duration: 0.22, ease: [0.76, 0, 0.24, 1] } }}
-                      exit={{ clipPath: "inset(100% 100% 0 0)", transition: { delay: (15 - revealOrder) * 0.018, duration: 0.18, ease: [0.76, 0, 0.24, 1] } }}
-                    />
-                  );
-                })}
+              <span className="menu-backdrop-paint" aria-hidden="true">
+                {Array.from({ length: 3 }, (_, stroke) => (
+                  <motion.i
+                    key={stroke}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1, transition: { delay: (2 - stroke) * 0.09, duration: 0.52, ease: [0.76, 0, 0.24, 1] } }}
+                    exit={{ scaleX: 0, transition: { delay: stroke * 0.04, duration: 0.34, ease: [0.76, 0, 0.24, 1] } }}
+                  />
+                ))}
               </span>
             </motion.button>
             <motion.nav
