@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import NextLink from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import type { ComponentProps, MouseEvent } from "react";
+import type { ComponentProps, MouseEvent as ReactMouseEvent } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -43,13 +43,13 @@ function indexFromHref(href: string) {
 type TransitionLinkProps = Omit<ComponentProps<typeof NextLink>, "href" | "onClick"> & {
   href: string;
   transitionLabel?: string;
-  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  onClick?: (event: ReactMouseEvent<HTMLAnchorElement>) => void;
 };
 
 export function TransitionLink({ href, transitionLabel, onClick, children, ...props }: TransitionLinkProps) {
   const transition = useContext(TransitionContext);
 
-  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);
     if (
       event.defaultPrevented ||
@@ -112,11 +112,11 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
     const tick = (time: number) => { lenis.raf(time); frame = requestAnimationFrame(tick); };
     frame = requestAnimationFrame(tick);
 
-    const move = (event: MouseEvent) => {
+    const move = (event: globalThis.MouseEvent) => {
       if (!cursor.current) return;
       gsap.to(cursor.current, { x: event.clientX, y: event.clientY, duration: 0.16, ease: "power2.out" });
     };
-    const enter = (event: MouseEvent) => {
+    const enter = (event: globalThis.MouseEvent) => {
       const target = event.target as HTMLElement;
       cursor.current?.setAttribute("data-active", String(Boolean(target.closest("a, button"))));
     };

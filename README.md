@@ -1,78 +1,48 @@
-# Amal Engulatov — Portfolio
+# My Portfolio
 
-A motion-focused portfolio for Amal Engulatov, an AI Software Engineer based in Seattle, WA. The site presents selected work, education, certifications, capabilities, and a direct contact experience in a minimal editorial design.
+Hi, I'm Amal Engulatov. I'm an AI software engineer based in Seattle, Washington. I like building useful AI agents and full-stack products that solve real problems and are simple for people to use.
 
-## Highlights
+This is the source code for my personal portfolio. I built it to share my projects, background, education, and the technologies I am currently working with.
 
-- Responsive Home, Work, About, Contact, and project case-study pages
-- Custom page transitions with a dedicated RetainAI transition theme
-- Smooth scrolling powered by Lenis
-- GSAP and ScrollTrigger content reveals
-- Motion-based fullscreen navigation
-- Animated AI signal system in the home hero
-- Project-specific color palettes and visual treatments
-- Formspree contact form with validation and success states
-- Reduced-motion support and mobile layouts
+## About me
 
-## Featured project
+I'm studying technology at Bellevue College through the Associate Degree Transfer Program. I also completed the Full-Stack Web Development Boot Camp at the University of Washington.
 
-### RetainAI
+My certifications include:
 
-An AI-powered customer-success platform that brings account context, conversations, and next-best actions into one focused workflow.
+- Meta Front-End Developer Professional Certificate — completed
+- Google IT Support Professional Certificate — completed
+- Generative AI Software Engineering Specialization — in progress
+- MCP: Build Rich-Context AI Apps with Anthropic — in progress
 
-- [Live case study](https://retainai-copilot.amalai.chatgpt.site/case-study)
-- [Source code](https://github.com/AmalEN20/RetainAI)
+Right now I am focused on AI engineering, agents, full-stack development, and building products around real customer needs.
 
-## Tech stack
+## RetainAI
 
-- Next.js and React
-- TypeScript
-- Tailwind CSS
-- GSAP and ScrollTrigger
-- Motion
-- Lenis
-- Formspree
-- vinext / Cloudflare-compatible build
+The main project in my portfolio is RetainAI, an AI customer-success copilot. It brings customer context, conversations, risk signals, and next actions into one place while keeping important actions behind human approval.
 
-## Getting started
+- [View the live case study](https://retainai-copilot.amalai.chatgpt.site/case-study)
+- [View the source code](https://github.com/AmalEN20/RetainAI)
 
-Requirements: Node.js 22.13 or newer.
+## What I used
+
+The portfolio is built with Next.js, React, TypeScript, Tailwind CSS, GSAP, Motion, Lenis, and Formspree. I created the page transitions, loading intro, responsive layouts, project pages, and contact form specifically for this site.
+
+## Run it locally
+
+You need Node.js 22.13 or newer.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the local URL shown in the terminal.
-
-## Available scripts
-
-```bash
-npm run dev     # Start the development server
-npm run build   # Create and validate a production build
-npm run lint    # Run ESLint
-npm test        # Build and run rendered HTML tests
-```
-
-## Project structure
-
-```text
-app/
-├── about/          About, education, and certifications
-├── contact/        Contact page and Formspree form
-├── work/           Project index and case studies
-├── components/     Navigation, transitions, forms, and visuals
-├── data/           Portfolio project data
-└── globals.css     Design system, responsive styles, and motion
-public/             Static project assets
-```
+Then open the local address shown in the terminal.
 
 ## Contact
 
 - Email: [amal.engulatov1@gmail.com](mailto:amal.engulatov1@gmail.com)
-- LinkedIn: [Amal Engulatov](https://www.linkedin.com/in/amal-engulatov-18b144277/)
-- GitHub: [AmalEN20](https://github.com/AmalEN20)
+- LinkedIn: [linkedin.com/in/amal-engulatov-18b144277](https://www.linkedin.com/in/amal-engulatov-18b144277/)
+- GitHub: [github.com/AmalEN20](https://github.com/AmalEN20)
 
-## License
-
-This portfolio and its design are personal work by Amal Engulatov. Please do not reproduce the design or personal content without permission.
+I'm open to AI engineering opportunities, collaborations, and conversations about building useful products.
