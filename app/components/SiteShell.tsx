@@ -11,10 +11,13 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "Work", href: "/work" },
+  { label: "Projects", href: "/work" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
+
+const introItems = ["ChatGPT", "Claude", "Codex", "Cursor", "Gemini", "Copilot", "Perplexity", "Replit", "LangChain", "MCP", "AI Agents"];
+const aiCompanies = ["OpenAI", "Anthropic", "Google DeepMind", "xAI", "Mistral AI", "Hugging Face"];
 
 type TransitionState = { href: string; label: string };
 
@@ -25,7 +28,7 @@ const TransitionContext = createContext<{
 
 function labelFromHref(href: string) {
   if (href === "/") return "Home";
-  if (href === "/work") return "Work";
+  if (href === "/work") return "Projects";
   if (href === "/about") return "About";
   if (href === "/contact") return "Contact";
   const lastPart = href.split("/").filter(Boolean).pop() ?? "Next";
@@ -74,6 +77,31 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const pageRevealPending = useRef(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [transition, setTransition] = useState<TransitionState | null>(null);
+  const [introActive, setIntroActive] = useState(true);
+  const [introExiting, setIntroExiting] = useState(false);
+  const [introIndex, setIntroIndex] = useState(0);
+  const [floatingMenuVisible, setFloatingMenuVisible] = useState(false);
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) {
+      setIntroIndex(introItems.length - 1);
+      const reducedTimer = window.setTimeout(() => setIntroActive(false), 220);
+      return () => window.clearTimeout(reducedTimer);
+    }
+
+    const step = 200;
+    const itemTimers = introItems.slice(1).map((_, index) =>
+      window.setTimeout(() => setIntroIndex(index + 1), step * (index + 1)),
+    );
+    const exitTimer = window.setTimeout(() => setIntroExiting(true), step * introItems.length + 80);
+    const finishTimer = window.setTimeout(() => setIntroActive(false), step * introItems.length + 1040);
+    return () => {
+      itemTimers.forEach((timer) => window.clearTimeout(timer));
+      window.clearTimeout(exitTimer);
+      window.clearTimeout(finishTimer);
+    };
+  }, []);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -104,6 +132,13 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (introActive) {
+      gsap.set(".line-mask > span", { y: "112%" });
+      gsap.set(".reveal-line", { opacity: 0 });
+      gsap.set(".reveal-up", { y: 60, opacity: 0 });
+      return;
+    }
+
     if (transition) {
       if (pathname === transition.href) {
         pageRevealPending.current = true;
@@ -145,12 +180,19 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       window.clearTimeout(animationTimer);
       context?.revert();
     };
-  }, [pathname, transition]);
+  }, [introActive, pathname, transition]);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen || transition ? "hidden" : "";
+    document.body.style.overflow = menuOpen || transition || introActive ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [menuOpen, transition]);
+  }, [introActive, menuOpen, transition]);
+
+  useEffect(() => {
+    const updateFloatingMenu = () => setFloatingMenuVisible(window.scrollY > 120);
+    updateFloatingMenu();
+    window.addEventListener("scroll", updateFloatingMenu, { passive: true });
+    return () => window.removeEventListener("scroll", updateFloatingMenu);
+  }, [pathname]);
 
   const navigate = useCallback((href: string, label: string) => {
     setMenuOpen(false);
@@ -175,6 +217,68 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
     <TransitionContext.Provider value={{ navigate, pathname }}>
       <div ref={cursor} className="cursor-dot" data-active="false" aria-hidden="true" />
+      <AnimatePresence>
+        {introActive && (
+          <motion.div className={`intro-loader ${introExiting ? "intro-exiting" : ""}`} initial={false} exit={{ opacity: 0 }} transition={{ duration: 0.05 }} aria-live="polite">
+            <div className="intro-loader-panels" aria-hidden="true">
+              {Array.from({ length: 5 }, (_, panel) => <i key={panel} />)}
+            </div>
+            <div className="intro-loader-grid" aria-hidden="true" />
+            <div className="intro-loader-orbit" aria-hidden="true"><i /><i /><i /><b /><b /><b /></div>
+            <div className="intro-company-cloud" aria-hidden="true">
+              {aiCompanies.map((company) => <span key={company}>{company}</span>)}
+            </div>
+            <div className="container-shell intro-loader-inner">
+              <div className="intro-loader-meta"><span className="eyebrow">Amal Engulatov / AI Software Engineer</span><span className="eyebrow">{String(introIndex + 1).padStart(2, "0")} / {String(introItems.length).padStart(2, "0")}</span></div>
+              <div className="intro-word-mask">
+                <AnimatePresence initial={false}>
+                  <motion.span
+                    key={introItems[introIndex]}
+                    className="intro-loader-word"
+                    initial="enter"
+                    animate="center"
+                    exit="leave"
+                  >
+                    {Array.from(introItems[introIndex]).map((character, characterIndex) => (
+                      <motion.i
+                        key={`${character}-${characterIndex}`}
+                        custom={characterIndex}
+                        variants={{
+                          enter: (index: number) => ({
+                            opacity: 0,
+                            x: (index % 3 - 1) * 16,
+                            y: index % 2 === 0 ? -18 : 18,
+                            rotate: index % 2 === 0 ? -14 : 14,
+                            scale: 0.35,
+                          }),
+                          center: (index: number) => ({
+                            opacity: 1,
+                            x: 0,
+                            y: 0,
+                            rotate: 0,
+                            scale: 1,
+                            transition: { delay: index * 0.014, duration: 0.24, ease: [0.22, 1, 0.36, 1] },
+                          }),
+                          leave: (index: number) => ({
+                            opacity: 0,
+                            x: (index % 3 - 1) * -18,
+                            y: index % 2 === 0 ? 20 : -20,
+                            rotate: index % 2 === 0 ? 16 : -16,
+                            scale: 0.28,
+                            transition: { delay: index * 0.01, duration: 0.2, ease: [0.55, 0, 1, 0.45] },
+                          }),
+                        }}
+                      >
+                        {character === " " ? "\u00A0" : character}
+                      </motion.i>
+                    ))}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <header className={`site-header ${pathname === "/" || pathname === "/contact" || isRetainAIPage ? "header-on-blue" : "header-on-light"}`}>
         <div className="container-shell header-inner">
           <TransitionLink href="/" className="brand" transitionLabel="Home">© Amal Engulatov</TransitionLink>
@@ -186,6 +290,26 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <button className="menu-button" type="button" aria-label="Open navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>Menu</button>
         </div>
       </header>
+
+      <AnimatePresence>
+        {floatingMenuVisible && !menuOpen && !introActive && !transition && (
+          <motion.button
+            className="floating-menu-trigger"
+            type="button"
+            aria-label="Open navigation"
+            onClick={() => setMenuOpen(true)}
+            initial={{ x: 34, scale: 0.68, rotate: 18, opacity: 0 }}
+            animate={{ x: 0, scale: 1, rotate: 0, opacity: 1 }}
+            exit={{ x: 24, scale: 0.76, rotate: -12, opacity: 0 }}
+            whileHover={{ scale: 1.08, rotate: 4 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ duration: 0.46, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <span className="floating-menu-ring" aria-hidden="true" />
+            <span className="floating-menu-lines" aria-hidden="true"><i /><i /><i /></span>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {children}
 
@@ -250,7 +374,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                       transition={{ delay: 0.24 + index * 0.045, duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
                     >{character === " " ? "\u00a0" : character}</motion.span>
                   ))}
-                  <motion.span className="route-transition-dash" initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 1 }} transition={{ delay: 0.48 + transition.label.length * 0.035, duration: 0.55 }}>—</motion.span>
                 </span>
               </h2>
               <motion.span className="route-transition-index" aria-hidden="true" initial={{ opacity: 0, x: 80 }} animate={{ opacity: 0.12, x: 0 }} transition={{ delay: 0.38, duration: 0.75 }}>{indexFromHref(transition.href)}</motion.span>

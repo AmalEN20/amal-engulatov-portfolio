@@ -3,13 +3,13 @@ import { ProjectVisual } from "../components/ProjectVisual";
 import { TransitionLink } from "../components/SiteShell";
 import { projects } from "../data/projects";
 
-export const metadata: Metadata = { title: "Work" };
+export const metadata: Metadata = { title: "Projects" };
 
 export default function WorkPage() {
   return (
     <main className="inner-page">
       <section className="page-hero container-shell">
-        <span className="eyebrow reveal-line">Work / 2026</span>
+        <span className="eyebrow reveal-line">Projects / 2026</span>
         <h1 className="page-title"><span className="line-mask"><span>Selected</span></span><span className="line-mask"><span>projects—</span></span></h1>
         <p className="page-lead reveal-up">A focused collection of AI products built around real customer problems, beginning with RetainAI.</p>
       </section>

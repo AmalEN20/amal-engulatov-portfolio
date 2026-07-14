@@ -35,9 +35,13 @@ export default function Home() {
 
       <section className="intro-section">
         <div className="container-shell intro-grid reveal-up">
-          <span className="eyebrow">What I do</span>
-          <div>
-            <p className="intro-copy">I combine product thinking, software engineering, and applied AI to create tools people can trust and businesses can use.</p>
+          <div className="intro-topline">
+            <span className="eyebrow">What I do</span>
+            <span className="eyebrow">Product thinking · Engineering · Applied AI</span>
+          </div>
+          <p className="intro-copy">I turn complex ideas into intelligent products people can understand, trust, and actually use.</p>
+          <div className="intro-bottomline">
+            <p>From defining the real problem to engineering the working system, I build across the complete product experience.</p>
             <TransitionLink className="text-link" href="/about">More about me <span>↗</span></TransitionLink>
           </div>
         </div>
@@ -46,7 +50,7 @@ export default function Home() {
       <section className="projects-section">
         <div className="container-shell">
           <div className="section-head reveal-up">
-            <div><span className="eyebrow">Selected work</span><h2>Projects with purpose.</h2></div>
+            <div><span className="eyebrow">Selected projects</span><h2>Projects with purpose.</h2></div>
             <span className="eyebrow">01 — {String(projects.length).padStart(2, "0")}</span>
           </div>
           <div className="project-list">
@@ -62,7 +66,7 @@ export default function Home() {
               </TransitionLink>
             ))}
           </div>
-          <div className="section-action"><TransitionLink className="pill-link" href="/work">View all work <span>↗</span></TransitionLink></div>
+          <div className="section-action"><TransitionLink className="pill-link" href="/work">View all projects <span>↗</span></TransitionLink></div>
         </div>
       </section>
 

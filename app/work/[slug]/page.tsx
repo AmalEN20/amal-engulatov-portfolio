@@ -22,7 +22,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       </section>
       <section className="case-grid container-shell reveal-up">
         <aside><span className="eyebrow">Project status</span><p>{project.status}</p><span className="eyebrow">Role</span><p>Product design<br />AI engineering<br />Full-stack development</p><div className="case-links"><a className="text-link" href={project.liveUrl} target="_blank" rel="noreferrer">View live project <span>↗</span></a><a className="text-link" href={project.url} target="_blank" rel="noreferrer">View on GitHub <span>↗</span></a></div></aside>
-        <div><span className="eyebrow">Overview</span><h2>From scattered signals to a clear next action.</h2><p>RetainAI is designed around a simple idea: customer teams should spend less time assembling context and more time helping people. The product brings the right signals together and prepares an explainable next step.</p><TransitionLink className="pill-link" href="/work">Back to all work <span>↗</span></TransitionLink></div>
+        <div><span className="eyebrow">Overview</span><h2>From scattered signals to a clear next action.</h2><p>RetainAI is designed around a simple idea: customer teams should spend less time assembling context and more time helping people. The product brings the right signals together and prepares an explainable next step.</p><TransitionLink className="pill-link" href="/work">Back to all projects <span>↗</span></TransitionLink></div>
       </section>
     </main>
   );
