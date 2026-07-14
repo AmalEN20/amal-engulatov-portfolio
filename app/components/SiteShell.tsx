@@ -254,12 +254,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                   >
                     {introItems[introIndex] === "AI Agents" ? (
                       <>
-                        <motion.span
-                          className="intro-final-ai"
-                          initial={{ scale: 1, letterSpacing: "-0.045em" }}
-                          animate={introAiOnly ? { scale: 1.08, letterSpacing: "0.025em" } : { scale: 1, letterSpacing: "-0.045em" }}
-                          transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
-                        >AI</motion.span>
+                        <span className="intro-final-ai">AI</span>
                         <motion.span
                           className="intro-final-agents"
                           initial={{ maxWidth: "5.5em", marginLeft: "0.22em", opacity: 1, x: 0, clipPath: "inset(0 0 0 0%)" }}
@@ -267,9 +262,9 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                             ? { maxWidth: 0, marginLeft: 0, opacity: 0, x: 18, clipPath: "inset(0 0 0 100%)" }
                             : { maxWidth: "5.5em", marginLeft: "0.22em", opacity: 1, x: 0, clipPath: "inset(0 0 0 0%)" }}
                           transition={{
-                            maxWidth: { duration: 0.24, ease: [0.76, 0, 0.24, 1] },
-                            marginLeft: { duration: 0.24, ease: [0.76, 0, 0.24, 1] },
-                            clipPath: { duration: 0.18, ease: [0.76, 0, 0.24, 1] },
+                            maxWidth: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+                            marginLeft: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+                            clipPath: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
                             opacity: { duration: 0.12, ease: "easeOut" },
                             x: { duration: 0.2, ease: "easeOut" },
                           }}
