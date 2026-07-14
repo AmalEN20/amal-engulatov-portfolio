@@ -42,7 +42,7 @@ export default function Home() {
           <p className="intro-copy">I turn complex ideas into intelligent products people can understand, trust, and actually use.</p>
           <div className="intro-bottomline">
             <p>From defining the real problem to engineering the working system, I build across the complete product experience.</p>
-            <TransitionLink className="text-link" href="/about">More about me <span>↗</span></TransitionLink>
+            <TransitionLink className="text-link" href="/about">More about me <span className="link-arrow" aria-hidden="true" /></TransitionLink>
           </div>
         </div>
       </section>
@@ -62,11 +62,11 @@ export default function Home() {
                   <p>{project.category}</p>
                 </div>
                 <ProjectVisual variant={project.variant} compact imageSrc={project.image} imageAlt={`${project.title} case study interface`} />
-                <span className="row-arrow">↗</span>
+                <span className="link-arrow row-arrow" aria-hidden="true" />
               </TransitionLink>
             ))}
           </div>
-          <div className="section-action"><TransitionLink className="pill-link" href="/work">View all projects <span>↗</span></TransitionLink></div>
+          <div className="section-action"><TransitionLink className="pill-link" href="/work">View all projects <span className="link-arrow" aria-hidden="true" /></TransitionLink></div>
         </div>
       </section>
 
@@ -74,7 +74,7 @@ export default function Home() {
         <div className="container-shell">
           <span className="eyebrow">Have a project or opportunity?</span>
           <h2>Let’s make something <em>useful.</em></h2>
-          <TransitionLink className="cta-link" href="/contact">Get in touch <span>↗</span></TransitionLink>
+          <TransitionLink className="cta-link" href="/contact">Get in touch <span className="link-arrow" aria-hidden="true" /></TransitionLink>
         </div>
       </section>
     </main>

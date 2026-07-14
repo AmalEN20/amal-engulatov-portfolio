@@ -17,7 +17,7 @@ export default function WorkPage() {
         {projects.map((project, index) => (
           <TransitionLink className="work-card reveal-up" key={project.slug} href={`/work/${project.slug}`} transitionLabel={project.title}>
             <ProjectVisual variant={project.variant} imageSrc={project.image} imageAlt={`${project.title} case study interface`} />
-            <div className="work-card-meta"><span className="project-number">0{index + 1}</span><div><h2>{project.title}</h2><p>{project.category}</p></div><span>{project.year} ↗</span></div>
+            <div className="work-card-meta"><span className="project-number">0{index + 1}</span><div><h2>{project.title}</h2><p>{project.category}</p></div><span>{project.year} <span className="link-arrow" aria-hidden="true" /></span></div>
           </TransitionLink>
         ))}
       </section>

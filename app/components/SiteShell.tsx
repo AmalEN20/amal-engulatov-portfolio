@@ -75,6 +75,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const cursor = useRef<HTMLDivElement>(null);
   const pageRevealPending = useRef(false);
+  const introRevealStarted = useRef(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [transition, setTransition] = useState<TransitionState | null>(null);
   const [introActive, setIntroActive] = useState(true);
@@ -90,12 +91,12 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       return () => window.clearTimeout(reducedTimer);
     }
 
-    const step = 200;
+    const step = 150;
     const itemTimers = introItems.slice(1).map((_, index) =>
       window.setTimeout(() => setIntroIndex(index + 1), step * (index + 1)),
     );
-    const exitTimer = window.setTimeout(() => setIntroExiting(true), step * introItems.length + 80);
-    const finishTimer = window.setTimeout(() => setIntroActive(false), step * introItems.length + 1040);
+    const exitTimer = window.setTimeout(() => setIntroExiting(true), step * introItems.length + 40);
+    const finishTimer = window.setTimeout(() => setIntroActive(false), step * introItems.length + 860);
     return () => {
       itemTimers.forEach((timer) => window.clearTimeout(timer));
       window.clearTimeout(exitTimer);
@@ -132,7 +133,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (introActive) {
+    if (introActive && !introExiting) {
       gsap.set(".line-mask > span", { y: "112%" });
       gsap.set(".reveal-line", { opacity: 0 });
       gsap.set(".reveal-up", { y: 60, opacity: 0 });
@@ -149,6 +150,13 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    if (!introActive && introRevealStarted.current) {
+      introRevealStarted.current = false;
+      return;
+    }
+
+    const isIntroExitReveal = introActive && introExiting;
+    if (isIntroExitReveal) introRevealStarted.current = true;
     const revealDelay = pageRevealPending.current ? 820 : 0;
     let context: gsap.Context | undefined;
     const animationTimer = window.setTimeout(() => {
@@ -178,9 +186,9 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
     return () => {
       window.clearTimeout(animationTimer);
-      context?.revert();
+      if (!isIntroExitReveal) context?.revert();
     };
-  }, [introActive, pathname, transition]);
+  }, [introActive, introExiting, pathname, transition]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen || transition || introActive ? "hidden" : "";
@@ -235,43 +243,12 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                   <motion.span
                     key={introItems[introIndex]}
                     className="intro-loader-word"
-                    initial="enter"
-                    animate="center"
-                    exit="leave"
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.04 }}
+                    transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    {Array.from(introItems[introIndex]).map((character, characterIndex) => (
-                      <motion.i
-                        key={`${character}-${characterIndex}`}
-                        custom={characterIndex}
-                        variants={{
-                          enter: (index: number) => ({
-                            opacity: 0,
-                            x: (index % 3 - 1) * 16,
-                            y: index % 2 === 0 ? -18 : 18,
-                            rotate: index % 2 === 0 ? -14 : 14,
-                            scale: 0.35,
-                          }),
-                          center: (index: number) => ({
-                            opacity: 1,
-                            x: 0,
-                            y: 0,
-                            rotate: 0,
-                            scale: 1,
-                            transition: { delay: index * 0.014, duration: 0.24, ease: [0.22, 1, 0.36, 1] },
-                          }),
-                          leave: (index: number) => ({
-                            opacity: 0,
-                            x: (index % 3 - 1) * -18,
-                            y: index % 2 === 0 ? 20 : -20,
-                            rotate: index % 2 === 0 ? 16 : -16,
-                            scale: 0.28,
-                            transition: { delay: index * 0.01, duration: 0.2, ease: [0.55, 0, 1, 0.45] },
-                          }),
-                        }}
-                      >
-                        {character === " " ? "\u00A0" : character}
-                      </motion.i>
-                    ))}
+                    {introItems[introIndex]}
                   </motion.span>
                 </AnimatePresence>
               </div>
@@ -317,7 +294,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         <div className="container-shell footer-inner">
           <div><span className="eyebrow">Version</span><p>2026 © Edition</p></div>
           <div><span className="eyebrow">Location</span><p>Seattle, WA · PT</p></div>
-          <div className="footer-social"><span className="eyebrow">Socials</span><p><a href="https://www.linkedin.com/in/amal-engulatov-18b144277/" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="https://github.com/AmalEN20?tab=repositories" target="_blank" rel="noreferrer">GitHub ↗</a></p></div>
+          <div className="footer-social"><span className="eyebrow">Socials</span><p><a href="https://www.linkedin.com/in/amal-engulatov-18b144277/" target="_blank" rel="noreferrer">LinkedIn <span className="link-arrow" aria-hidden="true" /></a><a href="https://github.com/AmalEN20?tab=repositories" target="_blank" rel="noreferrer">GitHub <span className="link-arrow" aria-hidden="true" /></a></p></div>
         </div>
       </footer>
 
@@ -328,7 +305,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             <motion.nav className="menu-panel" aria-label="Fullscreen navigation" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ duration: 0.62, ease: [0.76, 0, 0.24, 1] }}>
               <div className="menu-top"><span className="eyebrow">Navigation</span><button className="menu-close" onClick={() => setMenuOpen(false)}>Close ×</button></div>
               <div className="menu-links">
-                {navItems.map((item, index) => <TransitionLink key={item.href} href={item.href} transitionLabel={item.label} onClick={() => setMenuOpen(false)}><small>0{index + 1}</small>{item.label}</TransitionLink>)}
+                {navItems.map((item) => <TransitionLink key={item.href} href={item.href} transitionLabel={item.label} onClick={() => setMenuOpen(false)}>{item.label}</TransitionLink>)}
               </div>
               <div className="menu-foot"><span>Open to opportunities</span><span>Seattle, WA · PT</span></div>
             </motion.nav>
@@ -376,7 +353,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                   ))}
                 </span>
               </h2>
-              <motion.span className="route-transition-index" aria-hidden="true" initial={{ opacity: 0, x: 80 }} animate={{ opacity: 0.12, x: 0 }} transition={{ delay: 0.38, duration: 0.75 }}>{indexFromHref(transition.href)}</motion.span>
+              <motion.span className="route-transition-index" aria-hidden="true" initial={{ opacity: 0, x: 80 }} animate={{ opacity: 0.12, x: 0 }} transition={{ delay: 0.38, duration: 0.75 }}>{transition.label}</motion.span>
               <div className="route-progress"><motion.i initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.18, duration: 0.75, ease: [0.65, 0, 0.35, 1] }} /></div>
             </div>
           </motion.div>

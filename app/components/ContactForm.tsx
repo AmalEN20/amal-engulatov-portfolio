@@ -29,7 +29,7 @@ export function ContactForm() {
           <span className="eyebrow">Message sent</span>
           <h2>Thank you<span>.</span></h2>
           <p>Your message is on its way. I’ll read it and get back to you as soon as I can.</p>
-          <button className="form-reset" type="button" onClick={reset}>Send another message <span>↗</span></button>
+          <button className="form-reset" type="button" onClick={reset}>Send another message <span className="link-arrow" aria-hidden="true" /></button>
         </motion.div>
       ) : (
         <motion.form
@@ -92,7 +92,7 @@ export function ContactForm() {
             <p>By sending this form, you agree to be contacted about your message. No newsletters, no spam.</p>
             <button className="form-submit" type="submit" disabled={state.submitting}>
               <span>{state.submitting ? "Sending…" : "Send message"}</span>
-              <i aria-hidden="true">{state.submitting ? "↻" : "↗"}</i>
+              <i aria-hidden="true">{state.submitting ? "↻" : <span className="link-arrow" />}</i>
             </button>
           </div>
         </motion.form>

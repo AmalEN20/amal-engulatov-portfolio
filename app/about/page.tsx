@@ -27,7 +27,7 @@ export default function AboutPage() {
         </div></div>
         <div className="resume-block reveal-up"><span className="eyebrow">Capabilities</span><div className="capability-list"><span>AI agents & orchestration</span><span>Python & TypeScript</span><span>Full-stack product development</span><span>RAG & tool use</span><span>Product thinking</span><span>Interface engineering</span></div></div>
       </section>
-      <section className="about-cta container-shell reveal-up"><h2>Want the shorter version?</h2><TransitionLink className="pill-link" href="/contact">Start a conversation <span>↗</span></TransitionLink></section>
+      <section className="about-cta container-shell reveal-up"><h2>Want the shorter version?</h2><TransitionLink className="pill-link" href="/contact">Start a conversation <span className="link-arrow" aria-hidden="true" /></TransitionLink></section>
     </main>
   );
 }
