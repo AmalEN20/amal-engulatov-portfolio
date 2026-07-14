@@ -256,12 +256,13 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                       <>
                         <motion.span
                           className="intro-final-ai"
+                          initial={{ scale: 1, letterSpacing: "-0.045em" }}
                           animate={introAiOnly ? { scale: 1.08, letterSpacing: "0.025em" } : { scale: 1, letterSpacing: "-0.045em" }}
                           transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
                         >AI</motion.span>
                         <motion.span
                           className="intro-final-agents"
-                          initial={false}
+                          initial={{ maxWidth: "5.5em", marginLeft: "0.22em", opacity: 1, x: 0, clipPath: "inset(0 0 0 0%)" }}
                           animate={introAiOnly
                             ? { maxWidth: 0, marginLeft: 0, opacity: 0, x: 18, clipPath: "inset(0 0 0 100%)" }
                             : { maxWidth: "5.5em", marginLeft: "0.22em", opacity: 1, x: 0, clipPath: "inset(0 0 0 0%)" }}
