@@ -81,6 +81,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [introActive, setIntroActive] = useState(true);
   const [introExiting, setIntroExiting] = useState(false);
   const [introIndex, setIntroIndex] = useState(0);
+  const [introAiOnly, setIntroAiOnly] = useState(false);
   const [floatingMenuVisible, setFloatingMenuVisible] = useState(false);
 
   useEffect(() => {
@@ -91,14 +92,17 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       return () => window.clearTimeout(reducedTimer);
     }
 
-    const step = 150;
+    const step = 110;
+    const finalItemAt = step * (introItems.length - 1);
     const itemTimers = introItems.slice(1).map((_, index) =>
       window.setTimeout(() => setIntroIndex(index + 1), step * (index + 1)),
     );
-    const exitTimer = window.setTimeout(() => setIntroExiting(true), step * introItems.length + 40);
-    const finishTimer = window.setTimeout(() => setIntroActive(false), step * introItems.length + 860);
+    const aiOnlyTimer = window.setTimeout(() => setIntroAiOnly(true), finalItemAt + 430);
+    const exitTimer = window.setTimeout(() => setIntroExiting(true), finalItemAt + 750);
+    const finishTimer = window.setTimeout(() => setIntroActive(false), finalItemAt + 1570);
     return () => {
       itemTimers.forEach((timer) => window.clearTimeout(timer));
+      window.clearTimeout(aiOnlyTimer);
       window.clearTimeout(exitTimer);
       window.clearTimeout(finishTimer);
     };
@@ -248,7 +252,26 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                     exit={{ opacity: 0, scale: 1.04 }}
                     transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    {introItems[introIndex]}
+                    {introItems[introIndex] === "AI Agents" ? (
+                      <>
+                        <motion.span
+                          className="intro-final-ai"
+                          animate={introAiOnly ? { scale: 1.08, letterSpacing: "0.025em" } : { scale: 1, letterSpacing: "-0.045em" }}
+                          transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+                        >AI</motion.span>
+                        <AnimatePresence initial={false}>
+                          {!introAiOnly && (
+                            <motion.span
+                              className="intro-final-agents"
+                              initial={false}
+                              animate={{ width: "auto", marginLeft: "0.22em", opacity: 1, x: 0 }}
+                              exit={{ width: 0, marginLeft: 0, opacity: 0, x: 26, letterSpacing: "-0.12em" }}
+                              transition={{ duration: 0.38, ease: [0.76, 0, 0.24, 1] }}
+                            >Agents</motion.span>
+                          )}
+                        </AnimatePresence>
+                      </>
+                    ) : introItems[introIndex]}
                   </motion.span>
                 </AnimatePresence>
               </div>

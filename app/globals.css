@@ -283,11 +283,13 @@ a:hover .ui-window { transform: scale(1.025) rotate(-.5deg); }
 .intro-loader-meta { position: absolute; top: 34px; right: 0; left: 0; display: flex; justify-content: space-between; }
 .intro-word-mask { position: relative; z-index: 2; display: grid; width: 100%; height: min(34vh, 330px); place-items: center; overflow: hidden; isolation: isolate; }
 .intro-loader-word { position: absolute; z-index: 4; display: block; width: 100%; color: white; font-size: clamp(30px, 4.42vw, 70px); font-weight: 500; line-height: .92; letter-spacing: -.045em; text-align: center; text-shadow: 0 14px 55px rgba(5,20,75,.16); transform-origin: center; will-change: transform, opacity; }
+.intro-final-ai { display: inline-block; transform-origin: center; }
+.intro-final-agents { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; }
 .intro-loader-grid, .intro-loader-orbit, .intro-company-cloud, .intro-loader-inner { transition: opacity .2s ease, transform .42s cubic-bezier(.22,1,.36,1), filter .25s ease; }
 .intro-loader.intro-exiting { background: transparent; }
 .intro-loader.intro-exiting::before, .intro-loader.intro-exiting::after { opacity: 0; }
 .intro-loader.intro-exiting .intro-loader-grid, .intro-loader.intro-exiting .intro-loader-orbit, .intro-loader.intro-exiting .intro-company-cloud, .intro-loader.intro-exiting .intro-loader-inner { opacity: 0; transform: scale(.98); }
-.intro-loader.intro-exiting .intro-loader-panels i { animation: intro-panel-reveal .6s cubic-bezier(.76,0,.24,1) forwards; box-shadow: 0 0 0 1px rgba(255,255,255,.26); transform-origin: bottom; }
+.intro-loader.intro-exiting .intro-loader-panels i { animation: intro-panel-reveal .6s cubic-bezier(.76,0,.24,1) forwards; box-shadow: 0 0 0 1px rgba(255,255,255,.26); transform-origin: top; }
 .intro-loader.intro-exiting .intro-loader-panels i:nth-child(5) { animation-delay: 0s; }
 .intro-loader.intro-exiting .intro-loader-panels i:nth-child(4) { animation-delay: .045s; }
 .intro-loader.intro-exiting .intro-loader-panels i:nth-child(3) { animation-delay: .09s; }
