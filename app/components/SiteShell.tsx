@@ -98,8 +98,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       window.setTimeout(() => setIntroIndex(index + 1), step * (index + 1)),
     );
     const aiOnlyTimer = window.setTimeout(() => setIntroAiOnly(true), finalItemAt + 430);
-    const exitTimer = window.setTimeout(() => setIntroExiting(true), finalItemAt + 750);
-    const finishTimer = window.setTimeout(() => setIntroActive(false), finalItemAt + 1570);
+    const exitTimer = window.setTimeout(() => setIntroExiting(true), finalItemAt + 1030);
+    const finishTimer = window.setTimeout(() => setIntroActive(false), finalItemAt + 1850);
     return () => {
       itemTimers.forEach((timer) => window.clearTimeout(timer));
       window.clearTimeout(aiOnlyTimer);
@@ -161,7 +161,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
     const isIntroExitReveal = introActive && introExiting;
     if (isIntroExitReveal) introRevealStarted.current = true;
-    const revealDelay = pageRevealPending.current ? 820 : 0;
+    const revealDelay = 0;
     let context: gsap.Context | undefined;
     const animationTimer = window.setTimeout(() => {
       window.scrollTo(0, 0);
