@@ -257,18 +257,30 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                         <span className="intro-final-ai">AI</span>
                         <motion.span
                           className="intro-final-agents"
-                          initial={{ maxWidth: "5.5em", marginLeft: "0.22em", opacity: 1, x: 0, clipPath: "inset(0 0 0 0%)" }}
+                          aria-label="Agents"
+                          initial={{ maxWidth: "5.5em", marginLeft: "0.22em" }}
                           animate={introAiOnly
-                            ? { maxWidth: 0, marginLeft: 0, opacity: 0, x: 18, clipPath: "inset(0 0 0 100%)" }
-                            : { maxWidth: "5.5em", marginLeft: "0.22em", opacity: 1, x: 0, clipPath: "inset(0 0 0 0%)" }}
+                            ? { maxWidth: 0, marginLeft: 0 }
+                            : { maxWidth: "5.5em", marginLeft: "0.22em" }}
                           transition={{
-                            maxWidth: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
-                            marginLeft: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
-                            clipPath: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
-                            opacity: { duration: 0.12, ease: "easeOut" },
-                            x: { duration: 0.2, ease: "easeOut" },
+                            maxWidth: { delay: introAiOnly ? 0.28 : 0, duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+                            marginLeft: { delay: introAiOnly ? 0.28 : 0, duration: 0.3, ease: [0.22, 1, 0.36, 1] },
                           }}
-                        >Agents</motion.span>
+                        >
+                          <span className="intro-agents-measure" aria-hidden="true">Agents</span>
+                          <span className="intro-agents-curtains" aria-hidden="true">
+                            {Array.from({ length: 5 }, (_, curtain) => (
+                              <motion.span
+                                key={curtain}
+                                className="intro-agents-curtain"
+                                style={{ clipPath: `inset(0 ${80 - curtain * 20}% 0 ${curtain * 20}%)`, transformOrigin: "top" }}
+                                initial={false}
+                                animate={{ scaleY: introAiOnly ? 0 : 1 }}
+                                transition={{ delay: introAiOnly ? curtain * 0.03 : 0, duration: 0.24, ease: [0.76, 0, 0.24, 1] }}
+                              >Agents</motion.span>
+                            ))}
+                          </span>
+                        </motion.span>
                       </>
                     ) : introItems[introIndex]}
                   </motion.span>
@@ -340,8 +352,9 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               className="menu-panel"
               aria-label="Fullscreen navigation"
               initial={{ x: "100%" }}
-              animate={{ x: 0, transition: { delay: 0.3, duration: 0.62, ease: [0.76, 0, 0.24, 1] } }}
-              exit={{ x: "100%", transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1] } }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.62, ease: [0.76, 0, 0.24, 1] }}
             >
               <div className="menu-top"><span className="eyebrow">Navigation</span><button className="menu-close" onClick={() => setMenuOpen(false)}>Close ×</button></div>
               <div className="menu-links">
