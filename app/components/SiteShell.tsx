@@ -322,9 +322,27 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
       <AnimatePresence>
         {menuOpen && (
-          <motion.div className="menu-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1, pointerEvents: "auto" }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-            <motion.button className="menu-backdrop" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />
-            <motion.nav className="menu-panel" aria-label="Fullscreen navigation" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ duration: 0.62, ease: [0.76, 0, 0.24, 1] }}>
+          <motion.div className="menu-overlay" initial={false} animate={{ pointerEvents: "auto" }}>
+            <motion.button className="menu-backdrop" aria-label="Close navigation" onClick={() => setMenuOpen(false)}>
+              <span className="menu-backdrop-curtains" aria-hidden="true">
+                {Array.from({ length: 5 }, (_, panel) => (
+                  <motion.i
+                    key={panel}
+                    initial={{ scaleY: 0 }}
+                    animate={{ scaleY: 1 }}
+                    exit={{ scaleY: 0 }}
+                    transition={{ delay: (4 - panel) * 0.055, duration: 0.36, ease: [0.76, 0, 0.24, 1] }}
+                  />
+                ))}
+              </span>
+            </motion.button>
+            <motion.nav
+              className="menu-panel"
+              aria-label="Fullscreen navigation"
+              initial={{ x: "100%" }}
+              animate={{ x: 0, transition: { delay: 0.3, duration: 0.62, ease: [0.76, 0, 0.24, 1] } }}
+              exit={{ x: "100%", transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1] } }}
+            >
               <div className="menu-top"><span className="eyebrow">Navigation</span><button className="menu-close" onClick={() => setMenuOpen(false)}>Close ×</button></div>
               <div className="menu-links">
                 {navItems.map((item) => <TransitionLink key={item.href} href={item.href} transitionLabel={item.label} onClick={() => setMenuOpen(false)}>{item.label}</TransitionLink>)}
