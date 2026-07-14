@@ -336,17 +336,14 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         {menuOpen && (
           <motion.div className="menu-overlay" initial={false} animate={{ pointerEvents: "auto" }}>
             <motion.button className="menu-backdrop" aria-label="Close navigation" onClick={() => setMenuOpen(false)}>
-              <span className="menu-backdrop-curtains" aria-hidden="true">
-                {Array.from({ length: 6 }, (_, panel) => (
-                  <motion.i
-                    key={panel}
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1, transition: { delay: panel * 0.065, duration: 0.32, ease: [0.76, 0, 0.24, 1] } }}
-                    exit={{ scaleX: 0, transition: { delay: (5 - panel) * 0.035, duration: 0.24, ease: [0.76, 0, 0.24, 1] } }}
-                  />
-                ))}
-                <motion.b className="menu-backdrop-fill" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ delay: 0.62, duration: 0.1 }} />
-              </span>
+              <motion.span
+                className="menu-backdrop-reveal"
+                aria-hidden="true"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                exit={{ scaleX: 0 }}
+                transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
+              />
             </motion.button>
             <motion.nav
               className="menu-panel"
