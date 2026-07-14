@@ -97,7 +97,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
     const itemTimers = introItems.slice(1).map((_, index) =>
       window.setTimeout(() => setIntroIndex(index + 1), step * (index + 1)),
     );
-    const aiOnlyTimer = window.setTimeout(() => setIntroAiOnly(true), finalItemAt + 430);
+    const aiOnlyTimer = window.setTimeout(() => setIntroAiOnly(true), finalItemAt + 330);
     const exitTimer = window.setTimeout(() => setIntroExiting(true), finalItemAt + 930);
     const finishTimer = window.setTimeout(() => setIntroActive(false), finalItemAt + 1750);
     return () => {
