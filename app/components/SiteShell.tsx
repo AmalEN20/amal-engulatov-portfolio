@@ -19,7 +19,13 @@ const navItems = [
 const introItems = ["ChatGPT", "Claude", "Codex", "Cursor", "Gemini", "Copilot", "Perplexity", "Replit", "LangChain", "MCP", "AI Agents"];
 const aiCompanies = ["OpenAI", "Anthropic", "Google DeepMind", "xAI", "Mistral AI", "Hugging Face"];
 
-type TransitionState = { href: string; label: string };
+type TransitionPhase = "covering" | "covered" | "revealing";
+type TransitionState = {
+  href: string;
+  label: string;
+  phase: TransitionPhase;
+  requestId: number;
+};
 
 const TransitionContext = createContext<{
   navigate: (href: string, label: string) => void;
@@ -38,6 +44,12 @@ function labelFromHref(href: string) {
 function indexFromHref(href: string) {
   const index = navItems.findIndex((item) => item.href === href);
   return String(index >= 0 ? index + 1 : 1).padStart(2, "0");
+}
+
+function toneFromHref(href: string) {
+  if (href === "/work/retainai") return "retainai";
+  if (href === "/" || href === "/contact") return "dark";
+  return "light";
 }
 
 type TransitionLinkProps = Omit<ComponentProps<typeof NextLink>, "href" | "onClick"> & {
@@ -76,6 +88,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const cursor = useRef<HTMLDivElement>(null);
   const pageRevealPending = useRef(false);
   const introRevealStarted = useRef(false);
+  const transitionRequest = useRef(0);
+  const previousPathname = useRef(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
   const [transition, setTransition] = useState<TransitionState | null>(null);
   const [introActive, setIntroActive] = useState(true);
@@ -87,8 +101,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
-      setIntroIndex(introItems.length - 1);
-      const reducedTimer = window.setTimeout(() => setIntroActive(false), 220);
+      const reducedTimer = window.setTimeout(() => {
+        setIntroIndex(introItems.length - 1);
+        setIntroActive(false);
+      }, 0);
       return () => window.clearTimeout(reducedTimer);
     }
 
@@ -200,6 +216,18 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   }, [introActive, menuOpen, transition]);
 
   useEffect(() => {
+    if (previousPathname.current === pathname) return;
+    previousPathname.current = pathname;
+    const focusTimer = window.setTimeout(() => {
+      const heading = document.querySelector<HTMLElement>("main h1");
+      if (!heading) return;
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }, 0);
+    return () => window.clearTimeout(focusTimer);
+  }, [pathname]);
+
+  useEffect(() => {
     const updateFloatingMenu = () => setFloatingMenuVisible(window.scrollY > 120);
     updateFloatingMenu();
     window.addEventListener("scroll", updateFloatingMenu, { passive: true });
@@ -207,21 +235,51 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   const navigate = useCallback((href: string, label: string) => {
+    if (transition || href === pathname) return;
     setMenuOpen(false);
-    setTransition({ href, label });
-  }, []);
+    window.scrollTo(0, 0);
 
-  useEffect(() => {
-    if (!transition || pathname === transition.href) return;
-    const routeTimer = window.setTimeout(() => router.push(transition.href), 900);
-    return () => window.clearTimeout(routeTimer);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      router.push(href);
+      return;
+    }
+
+    transitionRequest.current += 1;
+    setTransition({ href, label, phase: "covering", requestId: transitionRequest.current });
   }, [pathname, router, transition]);
 
   useEffect(() => {
-    if (!transition || pathname !== transition.href) return;
-    const revealTimer = window.setTimeout(() => setTransition(null), 260);
+    if (!transition || transition.phase !== "covering") return;
+    const { href, requestId } = transition;
+    const routeTimer = window.setTimeout(() => {
+      setTransition((current) =>
+        current?.requestId === requestId ? { ...current, phase: "covered" } : current,
+      );
+      router.push(href);
+    }, 820);
+    return () => window.clearTimeout(routeTimer);
+  }, [router, transition]);
+
+  useEffect(() => {
+    if (!transition || transition.phase !== "covered" || pathname !== transition.href) return;
+    const { requestId } = transition;
+    window.scrollTo(0, 0);
+    const revealTimer = window.setTimeout(() => {
+      setTransition((current) =>
+        current?.requestId === requestId ? { ...current, phase: "revealing" } : current,
+      );
+    }, 150);
     return () => window.clearTimeout(revealTimer);
   }, [pathname, transition]);
+
+  useEffect(() => {
+    if (!transition || transition.phase !== "revealing") return;
+    const { requestId } = transition;
+    const finishTimer = window.setTimeout(() => {
+      setTransition((current) => current?.requestId === requestId ? null : current);
+    }, 460);
+    return () => window.clearTimeout(finishTimer);
+  }, [transition]);
 
   const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
   const isRetainAIPage = pathname === "/work/retainai";
@@ -366,46 +424,55 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <AnimatePresence>
         {transition && (
           <motion.div
-            className={`route-transition ${transition.href === "/work/retainai" ? "route-transition-retainai" : ""}`}
+            className={`route-transition-stage route-transition-tone-${toneFromHref(transition.href)}`}
             aria-live="polite"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "-100%" }}
-            transition={{ duration: 0.82, ease: [0.76, 0, 0.24, 1] }}
+            aria-label={`Going to ${transition.label}`}
+            data-phase={transition.phase}
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.12 }}
           >
-            <div className="route-transition-panels" aria-hidden="true">
-              {[0, 1, 2, 3, 4].map((panel) => (
-                <motion.i
-                  key={panel}
-                  initial={{ scaleY: 0 }}
-                  animate={{ scaleY: 1 }}
-                  transition={{ delay: 0.04 + panel * 0.055, duration: 0.66, ease: [0.76, 0, 0.24, 1] }}
-                />
-              ))}
-            </div>
-            <div className="route-transition-grid" aria-hidden="true" />
-            {transition.href === "/work/retainai" && (
-              <motion.div className="retainai-transition-bloom" aria-hidden="true" initial={{ scale: 0.08, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.12, duration: 1.15, ease: [0.16, 1, 0.3, 1] }} />
-            )}
-            <motion.div className="route-transition-orbit" aria-hidden="true" initial={{ scale: 0.55, rotate: -35, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={{ delay: 0.28, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}><i /><i /></motion.div>
-            <div className="container-shell route-transition-inner">
-              <motion.div className="route-transition-meta" initial={{ y: -24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.32, duration: 0.55 }}><span className="eyebrow">{transition.href === "/work/retainai" ? "Entering case study" : "Going to"} / {indexFromHref(transition.href)}</span><span className="eyebrow">Amal Engulatov © 2026</span></motion.div>
-              <h2 className="route-transition-title" aria-label={`Going to ${transition.label}`}>
-                <span className="route-transition-title-mask" aria-hidden="true">
-                  {Array.from(transition.label).map((character, index) => (
-                    <motion.span
-                      className="route-transition-character"
-                      key={`${character}-${index}`}
-                      initial={{ y: "125%", rotate: 5, opacity: 0 }}
-                      animate={{ y: 0, rotate: 0, opacity: 1 }}
-                      transition={{ delay: 0.24 + index * 0.045, duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
-                    >{character === " " ? "\u00a0" : character}</motion.span>
-                  ))}
-                </span>
-              </h2>
-              <motion.span className="route-transition-index" aria-hidden="true" initial={{ opacity: 0, x: 80 }} animate={{ opacity: 0.12, x: 0 }} transition={{ delay: 0.38, duration: 0.75 }}>{transition.label}</motion.span>
-              <div className="route-progress"><motion.i initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.18, duration: 0.75, ease: [0.65, 0, 0.35, 1] }} /></div>
-            </div>
+            <motion.div
+              className="route-transition-backdrop"
+              aria-hidden="true"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: transition.phase === "revealing" ? 0 : 1 }}
+              transition={{ duration: transition.phase === "revealing" ? 0.34 : 0.28, ease: "easeOut" }}
+            />
+            <motion.div
+              className="route-transition"
+              initial={{ clipPath: "inset(0 0 100% 0)" }}
+              animate={{
+                clipPath: "inset(0 0 0% 0)",
+                opacity: transition.phase === "revealing" ? 0 : 1,
+              }}
+              transition={{
+                clipPath: { duration: 0.82, ease: [0.76, 0, 0.24, 1] },
+                opacity: { duration: 0.44, ease: [0.16, 1, 0.3, 1] },
+              }}
+            >
+              <div className="route-transition-grid" aria-hidden="true" />
+              <div className="route-transition-edge" aria-hidden="true" />
+              <div className="container-shell route-transition-inner">
+                <motion.div className="route-transition-meta" initial={{ y: -18, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.28, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}><span className="eyebrow">Next / {indexFromHref(transition.href)}</span><span className="eyebrow">Amal Engulatov © 2026</span></motion.div>
+                <h2 className="route-transition-title" aria-label={`Going to ${transition.label}`}>
+                  <span className="route-transition-title-words" aria-hidden="true">
+                    {transition.label.split(/\s+/).map((word, index) => (
+                      <span className="route-transition-word-mask" key={`${word}-${index}`}>
+                        <motion.span
+                          className="route-transition-word"
+                          initial={{ y: "118%" }}
+                          animate={{ y: 0 }}
+                          transition={{ delay: 0.27 + index * 0.085, duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
+                        >{word}</motion.span>
+                      </span>
+                    ))}
+                  </span>
+                </h2>
+                <div className="route-progress"><motion.i initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.14, duration: 0.68, ease: [0.65, 0, 0.35, 1] }} /></div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
