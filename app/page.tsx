@@ -1,5 +1,3 @@
-import { SiteIntro } from "./components/SiteIntro";
-
 const sections = [
   { id: "top", label: "Hero", headingLevel: "h1" },
   { id: "work", label: "Work", headingLevel: "h2" },
@@ -9,15 +7,13 @@ const sections = [
 
 export default function Home() {
   return (
-    <>
-      <SiteIntro />
-      <main className="site-structure">
-        {sections.map(({ id, label, headingLevel }) => (
-          <section className="structure-section" id={id} key={id} aria-label={`${label} section`}>
-            {headingLevel === "h1" ? <h1>{label}</h1> : <h2>{label}</h2>}
-          </section>
-        ))}
-      </main>
-    </>
+    <main className="site-structure">
+      {sections.map(({ id, label, headingLevel }) => (
+        <section className="structure-section" id={id} key={id} aria-label={`${label} section`}>
+          {headingLevel === "h1" ? <PageTitle>{label}</PageTitle> : <h2>{label}</h2>}
+        </section>
+      ))}
+    </main>
   );
 }
+import { PageTitle } from "./components/PageTitle";

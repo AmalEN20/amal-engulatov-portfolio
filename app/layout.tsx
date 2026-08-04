@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SiteNav } from "./components/SiteNav";
+import { SiteShell } from "./components/SiteShell";
 import "./globals.css";
 
 const geist = Geist({
@@ -19,8 +21,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`${geist.variable} ${geistMono.variable}`}>{children}</body>
+    <html lang="en" data-scroll-behavior="smooth">
+      <body className={`${geist.variable} ${geistMono.variable}`}>
+        <SiteShell navigation={<SiteNav />}>{children}</SiteShell>
+      </body>
     </html>
   );
 }
