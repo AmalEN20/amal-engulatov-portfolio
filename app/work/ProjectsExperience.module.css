@@ -166,12 +166,17 @@
 }
 
 .card {
+  position: relative;
   overflow: hidden;
   border: 1px solid rgb(17 17 17 / 15%);
   border-radius: 14px;
   background: #fff;
   box-shadow: 0 34px 82px rgb(0 0 0 / 12%);
   transition: box-shadow 360ms ease, transform 520ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.experience[data-return-entry="true"] .card {
+  animation: projects-return-curtain 840ms 60ms cubic-bezier(.76, 0, .18, 1) both;
 }
 
 .cardLink:hover .card,
@@ -214,7 +219,7 @@
 }
 
 .cardMeta p,
-.cardMeta > span {
+.cardYear {
   color: rgb(17 17 17 / 52%);
   font-family: var(--font-geist-mono), monospace;
   font-size: .56rem;
@@ -223,12 +228,66 @@
   text-transform: uppercase;
 }
 
+.cardCopyMask,
+.cardYearMask {
+  display: block;
+  overflow: clip;
+  overflow-clip-margin: 3px;
+}
+
+.cardCopy,
+.cardYear {
+  display: block;
+}
+
+.experience[data-return-entry="true"] .cardCopy,
+.experience[data-return-entry="true"] .cardYear {
+  animation: projects-return-copy-in 620ms 480ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
 .cardMeta h2 {
+  position: relative;
   margin-top: 7px;
-  font-size: clamp(2.1rem, 3.6vw, 4rem);
-  font-weight: 450;
-  letter-spacing: -.065em;
-  line-height: .88;
+  font-size: clamp(1.8rem, 2.8vw, 3.1rem);
+  font-weight: 400;
+  letter-spacing: -.055em;
+  line-height: .94;
+}
+
+.cardTitleGradient {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: linear-gradient(
+    90deg,
+    #111 0%,
+    #111 35%,
+    #a7a7a7 50%,
+    #111 65%,
+    #111 100%
+  );
+  background-position: -180% 50%;
+  background-size: 240% 100%;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  animation: card-title-gradient-loop 3.4s linear infinite paused;
+  transition: opacity 220ms ease;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cardLink:hover .cardTitleGradient {
+    opacity: 1;
+    animation-play-state: running;
+  }
+}
+
+.cardLink:focus-visible .cardTitleGradient {
+  opacity: 1;
+  animation-play-state: running;
 }
 
 .finalMeta {
@@ -248,6 +307,48 @@
 
 .finalMeta p {
   margin: 0;
+}
+
+.finalMetaText {
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    rgb(17 17 17 / 54%) 0%,
+    rgb(17 17 17 / 54%) 38%,
+    #a7a7a7 50%,
+    rgb(17 17 17 / 54%) 62%,
+    rgb(17 17 17 / 54%) 100%
+  );
+  background-position: -180% 50%;
+  background-size: 240% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: final-meta-gradient-loop 3.8s linear infinite paused;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.finalMetaText:last-child {
+  animation-delay: -1.9s;
+}
+
+.experience[data-phase="hold"] .finalMetaText {
+  animation-play-state: running;
+}
+
+.experience[data-return-entry="true"] .finalMeta {
+  animation: projects-return-meta-in 720ms 220ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+:global(html[data-intro="active"]) .experience[data-return-entry="true"] .card,
+:global(html[data-intro="active"]) .experience[data-return-entry="true"] .cardCopy,
+:global(html[data-intro="active"]) .experience[data-return-entry="true"] .cardYear,
+:global(html[data-intro="active"]) .experience[data-return-entry="true"] .finalMeta,
+:global(html[data-route-content="hidden"]) .experience[data-return-entry="true"] .card,
+:global(html[data-route-content="hidden"]) .experience[data-return-entry="true"] .cardCopy,
+:global(html[data-route-content="hidden"]) .experience[data-return-entry="true"] .cardYear,
+:global(html[data-route-content="hidden"]) .experience[data-return-entry="true"] .finalMeta {
+  animation-play-state: paused;
 }
 
 .finalMeta p:last-child {
@@ -359,12 +460,12 @@
   }
 
   .cardMeta p,
-  .cardMeta > span {
+  .cardYear {
     font-size: .46rem;
   }
 
   .cardMeta h2 {
-    font-size: clamp(1.8rem, 8vw, 2.5rem);
+    font-size: clamp(1.55rem, 6.5vw, 2.05rem);
   }
 
   .finalMeta {
@@ -424,7 +525,60 @@
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
+@keyframes final-meta-gradient-loop {
+  from { background-position: -180% 50%; }
+  to { background-position: 180% 50%; }
+}
+
+@keyframes card-title-gradient-loop {
+  from { background-position: 180% 50%; }
+  to { background-position: -180% 50%; }
+}
+
+@keyframes projects-return-curtain {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(-140px); }
+}
+
+@keyframes projects-return-copy-in {
+  from { opacity: 0; transform: translate3d(0, 112%, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes projects-return-meta-in {
+  from { clip-path: inset(0 0 100% 0); transform: translate3d(0, 12px, 0); }
+  to { clip-path: inset(0); transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cardCopy,
+  .cardYear,
+  .finalMeta {
+    animation: none !important;
+    clip-path: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .cardTitleGradient {
+    display: none;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .finalMetaText {
+    background: none;
+    color: rgb(17 17 17 / 54%);
+    animation: none !important;
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
 @media (forced-colors: active) {
+  .cardTitleGradient {
+    display: none;
+  }
+
   .card,
   .cardVisual {
     border: 1px solid CanvasText;

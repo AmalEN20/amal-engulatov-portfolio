@@ -1,14 +1,37 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import type { CSSProperties, ReactNode } from "react";
 import { PageTitle } from "../../components/PageTitle";
-import { TransitionLink } from "../../components/SiteShell";
+import { AutoScrollProjectInfo } from "../AutoScrollProjectInfo";
+import { BackToProjectsLink } from "../BackToProjectsLink";
 import styles from "../ProjectDetail.module.css";
 import { getPortfolioProject, portfolioProjects } from "../projects";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+function RevealBlock({
+  children,
+  className = "",
+  index,
+}: {
+  children: ReactNode;
+  className?: string;
+  index: number;
+}) {
+  return (
+    <div className={styles.revealMask}>
+      <div
+        className={`${styles.revealBlock} ${className}`.trim()}
+        style={{ "--detail-index": index } as CSSProperties}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export function generateStaticParams() {
   return portfolioProjects.map(({ slug }) => ({ slug }));
@@ -32,14 +55,17 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <main className={styles.page}>
-      <TransitionLink href="/work" transitionLabel="Projects" className={styles.backLink}>
-        <span className={styles.backLabel}>Back to projects</span>
-        <span className={styles.backIcon} aria-hidden="true">↖</span>
-      </TransitionLink>
+      <BackToProjectsLink className={styles.backLink}>
+        <span className={styles.backRevealMask}>
+          <span className={styles.backReveal}>
+            <span className={styles.backLabel}>Back to projects</span>
+          </span>
+        </span>
+      </BackToProjectsLink>
 
       <section className={styles.hero} aria-labelledby="project-title">
         <div className={styles.heading} id="project-title">
-          <PageTitle>{project.title}</PageTitle>
+          <PageTitle className={styles.detailTitle}>{project.title}</PageTitle>
         </div>
       </section>
 
@@ -55,27 +81,34 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           />
         </div>
 
-        <div className={styles.projectInfo}>
-          <div className={styles.summaryBlock}>
-            <p className={styles.category}>{project.category}</p>
+        <AutoScrollProjectInfo
+          className={styles.projectInfo}
+          ariaLabel={`${project.title} project details`}
+        >
+          <RevealBlock className={styles.summaryBlock} index={3}>
+            <p className={`${styles.category} ${styles.metadataGradient}`}>
+              {project.category}
+            </p>
             <p className={styles.summary}>{project.summary}</p>
-          </div>
+          </RevealBlock>
 
-          <div className={styles.infoBlock}>
-            <p className={styles.infoLabel}>About the project</p>
+          <RevealBlock className={styles.infoBlock} index={4}>
+            <p className={`${styles.infoLabel} ${styles.metadataGradient}`}>
+              About the project
+            </p>
             <p className={styles.description}>{project.description}</p>
-          </div>
+          </RevealBlock>
 
           <div className={styles.projectMeta}>
-            <div>
-              <p className={styles.infoLabel}>Built with</p>
+            <RevealBlock index={5}>
+              <p className={`${styles.infoLabel} ${styles.metadataGradient}`}>Built with</p>
               <ul className={styles.stack} aria-label="Project technologies">
                 {project.stack.map((item) => <li key={item}>{item}</li>)}
               </ul>
-            </div>
+            </RevealBlock>
 
-            <div>
-              <p className={styles.infoLabel}>Source</p>
+            <RevealBlock index={6}>
+              <p className={`${styles.infoLabel} ${styles.metadataGradient}`}>Source</p>
               {project.repositoryUrl ? (
                 <a
                   href={project.repositoryUrl}
@@ -88,9 +121,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               ) : (
                 <p className={styles.repositoryStatus}>{project.repositoryLabel}</p>
               )}
-            </div>
+            </RevealBlock>
           </div>
-        </div>
+        </AutoScrollProjectInfo>
       </section>
     </main>
   );

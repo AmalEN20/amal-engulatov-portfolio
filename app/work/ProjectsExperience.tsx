@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { TransitionLink } from "../components/SiteShell";
+import { PROJECTS_RETURN_STORAGE_KEY } from "./projectReturn";
 import { portfolioProjects } from "./projects";
 import styles from "./ProjectsExperience.module.css";
 
@@ -28,11 +29,14 @@ const statementWords = statement.split(" ");
 export function ProjectsExperience() {
   const rootRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLElement>(null);
+  const cardsRef = useRef<HTMLOListElement>(null);
+  const returnIntentRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     const root = rootRef.current;
     const scene = sceneRef.current;
-    if (!root || !scene) return;
+    const cardsElement = cardsRef.current;
+    if (!root || !scene || !cardsElement) return;
 
     const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const cards = Array.from(root.querySelectorAll<MotionCard>("[data-project-card]"));
@@ -40,6 +44,61 @@ export function ProjectsExperience() {
     let frame = 0;
     let sceneTop = 0;
     let sceneDistance = 1;
+    if (returnIntentRef.current === null) {
+      try {
+        returnIntentRef.current = window.sessionStorage.getItem(PROJECTS_RETURN_STORAGE_KEY) === "cards";
+      } catch {
+        returnIntentRef.current = false;
+      }
+    }
+    const shouldReturnToCards = returnIntentRef.current;
+
+    const freezeCurrentFrame = () => {
+      if (root.dataset.motion !== "active" || root.dataset.exiting === "true") return;
+
+      root.dataset.exiting = "true";
+      root.querySelectorAll<HTMLElement>("[data-project-card] article").forEach((card) => {
+        const cardStyle = window.getComputedStyle(card);
+        card.style.transform = cardStyle.transform;
+        card.style.boxShadow = cardStyle.boxShadow;
+        card.style.transition = "none";
+
+        const image = card.querySelector<HTMLElement>("img");
+        if (!image) return;
+        image.style.transform = window.getComputedStyle(image).transform;
+        image.style.transition = "none";
+      });
+    };
+
+    const handleRouteClickCapture = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented
+        || event.button !== 0
+        || event.metaKey
+        || event.ctrlKey
+        || event.shiftKey
+        || event.altKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const link = target.closest<HTMLAnchorElement>("a[href]");
+      if (!link || link.target === "_blank" || link.hasAttribute("download")) return;
+
+      const destination = new URL(link.href, window.location.href);
+      if (destination.origin !== window.location.origin) return;
+      if (
+        destination.pathname === window.location.pathname
+        && destination.search === window.location.search
+      ) {
+        return;
+      }
+
+      freezeCurrentFrame();
+    };
 
     const setCardFrame = (
       card: MotionCard,
@@ -85,6 +144,8 @@ export function ProjectsExperience() {
 
     const render = () => {
       frame = 0;
+
+      if (root.dataset.exiting === "true") return;
 
       if (motionPreference.matches) {
         root.dataset.motion = "static";
@@ -143,19 +204,57 @@ export function ProjectsExperience() {
     };
 
     configure();
+
+    if (shouldReturnToCards) {
+      root.dataset.returnEntry = "true";
+      const documentRoot = document.documentElement;
+      const previousScrollBehavior = documentRoot.style.scrollBehavior;
+      const targetScroll = motionPreference.matches
+        ? cardsElement.getBoundingClientRect().top + window.scrollY - Math.min(120, window.innerHeight * 0.14)
+        : sceneTop + sceneDistance;
+
+      documentRoot.style.scrollBehavior = "auto";
+      window.scrollTo({ top: Math.max(targetScroll, 0), left: 0, behavior: "auto" });
+      if (previousScrollBehavior) {
+        documentRoot.style.scrollBehavior = previousScrollBehavior;
+      } else {
+        documentRoot.style.removeProperty("scroll-behavior");
+      }
+      render();
+
+      try {
+        window.sessionStorage.removeItem(PROJECTS_RETURN_STORAGE_KEY);
+      } catch {
+        // The final project frame is already rendered even if storage cleanup fails.
+      }
+
+    }
+
+    document.addEventListener("click", handleRouteClickCapture, true);
     window.addEventListener("scroll", scheduleRender, { passive: true });
     window.addEventListener("resize", measure, { passive: true });
     motionPreference.addEventListener("change", configure);
 
     return () => {
       window.cancelAnimationFrame(frame);
+      document.removeEventListener("click", handleRouteClickCapture, true);
       window.removeEventListener("scroll", scheduleRender);
       window.removeEventListener("resize", measure);
       motionPreference.removeEventListener("change", configure);
       cards.forEach((card) => card.removeAttribute("style"));
       cardLinks.forEach((link) => link?.removeAttribute("tabindex"));
+      root.querySelectorAll<HTMLElement>("[data-project-card] article").forEach((card) => {
+        card.style.removeProperty("box-shadow");
+        card.style.removeProperty("transform");
+        card.style.removeProperty("transition");
+        const image = card.querySelector<HTMLElement>("img");
+        image?.style.removeProperty("transform");
+        image?.style.removeProperty("transition");
+      });
       root.removeAttribute("data-motion");
       root.removeAttribute("data-phase");
+      root.removeAttribute("data-exiting");
+      root.removeAttribute("data-return-entry");
     };
   }, []);
 
@@ -193,8 +292,8 @@ export function ProjectsExperience() {
               </p>
             </header>
 
-            <ol className={styles.cards} aria-label="Selected projects">
-              {portfolioProjects.map((project, index) => (
+            <ol ref={cardsRef} className={styles.cards} aria-label="Selected projects">
+              {portfolioProjects.map((project) => (
                 <li
                   key={project.slug}
                   className={styles.cardItem}
@@ -212,17 +311,26 @@ export function ProjectsExperience() {
                           src={project.imageSrc}
                           alt={project.imageAlt}
                           fill
-                          priority={index === 0}
+                          loading="eager"
                           sizes="(max-width: 720px) 82vw, 42vw"
                           className={styles.cardImage}
                         />
                       </div>
                       <div className={styles.cardMeta}>
-                        <div>
-                          <p>{project.category}</p>
-                          <h2>{project.title}</h2>
+                        <div className={styles.cardCopyMask}>
+                          <div className={styles.cardCopy}>
+                            <p>{project.category}</p>
+                            <h2>
+                              {project.title}
+                              <span className={styles.cardTitleGradient} aria-hidden="true">
+                                {project.title}
+                              </span>
+                            </h2>
+                          </div>
                         </div>
-                        <span>{project.year} ↗</span>
+                        <span className={styles.cardYearMask}>
+                          <span className={styles.cardYear}>{project.year} ↗</span>
+                        </span>
                       </div>
                     </article>
                   </TransitionLink>
@@ -231,8 +339,8 @@ export function ProjectsExperience() {
             </ol>
 
             <div className={styles.finalMeta}>
-              <p>Selected projects</p>
-              <p>More case studies will be added when they are ready.</p>
+              <p className={styles.finalMetaText}>Selected projects</p>
+              <p className={styles.finalMetaText}>More case studies will be added when they are ready.</p>
             </div>
           </div>
         </section>
