@@ -256,6 +256,12 @@
   transform: translate3d(0, 16px, 0);
 }
 
+:global(html[data-route-content="hidden"]) .hero .titleWord,
+:global(html[data-route-content="hidden"]) .hero .portrait,
+:global(html[data-route-content="hidden"]) .hero .metaObject {
+  transition: none;
+}
+
 .hero[data-motion="entered"] .surnameWord {
   transition-delay: 75ms;
 }

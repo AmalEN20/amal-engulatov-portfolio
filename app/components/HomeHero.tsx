@@ -159,10 +159,7 @@ export function HomeHero() {
                 data-particle-erase="true"
                 aria-hidden="true"
               >
-                <span
-                  className={`page-title-word ${styles.titleWord} ${styles.givenWord}`}
-                  style={{ "--word-index": 0 } as CSSProperties}
-                >
+                <span className={styles.titleWord}>
                   Amal
                 </span>
               </span>
