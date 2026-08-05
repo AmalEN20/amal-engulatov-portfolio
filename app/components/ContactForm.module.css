@@ -1,0 +1,9 @@
+:global(.contact-page[data-motion="ready"])
+  :global(.contact-field-message)
+  .messagePlaceholder::before,
+:global(.contact-page[data-motion="ready"])
+  :global(.contact-field-message)
+  .messagePlaceholder
+  :global(.contact-placeholder-text)::after {
+  animation-duration: 660ms;
+}

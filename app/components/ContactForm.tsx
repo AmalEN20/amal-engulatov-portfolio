@@ -3,6 +3,7 @@
 import { ValidationError, useForm } from "@formspree/react";
 import { useState } from "react";
 import type { CSSProperties } from "react";
+import styles from "./ContactForm.module.css";
 
 const FORMSPREE_FORM_ID = "xykryaaj";
 
@@ -101,7 +102,7 @@ export function ContactForm() {
             maxLength={3000}
             required
           />
-          <span className="contact-placeholder" aria-hidden="true">
+          <span className={`contact-placeholder ${styles.messagePlaceholder}`} aria-hidden="true">
             <span className="contact-placeholder-text" data-text="The rough version is perfect.">
               The rough version is perfect.
             </span>
