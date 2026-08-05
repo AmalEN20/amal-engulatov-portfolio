@@ -151,7 +151,6 @@ export function ProjectsExperience() {
         root.dataset.motion = "static";
         root.dataset.phase = "hold";
         root.style.removeProperty("--projects-entry-out");
-        root.style.removeProperty("--projects-final-meta");
         cards.forEach((card) => card.removeAttribute("style"));
         cardLinks.forEach((link) => link?.removeAttribute("tabindex"));
         return;
@@ -161,7 +160,6 @@ export function ProjectsExperience() {
       const progress = clamp((window.scrollY - sceneTop) / sceneDistance);
       const mobile = window.innerWidth <= 720;
       const entryOut = smoothstep(0.04, 0.22, progress);
-      const finalMeta = smoothstep(0.7, 0.84, progress);
       const interactive = progress >= 0.8;
 
       root.dataset.phase = interactive
@@ -170,7 +168,6 @@ export function ProjectsExperience() {
           ? "projects"
           : "intro";
       root.style.setProperty("--projects-entry-out", entryOut.toFixed(4));
-      root.style.setProperty("--projects-final-meta", finalMeta.toFixed(4));
 
       cards.forEach((card, index) => {
         const start = index === 0 ? 0.3 : 0.42;
@@ -298,6 +295,7 @@ export function ProjectsExperience() {
                   key={project.slug}
                   className={styles.cardItem}
                   data-project-card
+                  data-project-slug={project.slug}
                 >
                   <TransitionLink
                     href={`/work/${project.slug}`}
@@ -337,11 +335,6 @@ export function ProjectsExperience() {
                 </li>
               ))}
             </ol>
-
-            <div className={styles.finalMeta}>
-              <p className={styles.finalMetaText}>Selected projects</p>
-              <p className={styles.finalMetaText}>More case studies will be added when they are ready.</p>
-            </div>
           </div>
         </section>
       </div>
