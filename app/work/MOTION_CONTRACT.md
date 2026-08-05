@@ -87,8 +87,10 @@ assets, or brand identity.
 
 ## 6. Desktop, mobile, and reduced motion
 
-- Desktop/trackpad: deliberate sticky interval; two landscape cards settle side by side.
-- Mobile/touch: shorter interval, native touch scrolling, and the two landscape cards settle
+- Fine-pointer wheel/trackpad at every viewport width: deliberate sticky interval with the shared
+  inertia owner; two landscape cards settle side by side on the desktop composition and vertically
+  on the narrow composition.
+- Mobile/touch: shorter interval, native touch momentum, and the two landscape cards settle
   vertically inside the final frame.
 - Reduced motion: no sticky interval, inertia, parallax, pin, or staged reveal. The heading and
   both links render immediately in normal document flow. Project titles remain solid black with no
@@ -107,7 +109,8 @@ assets, or brand identity.
 
 ## 8. Acceptance checks
 
-- Desktop wheel/trackpad: slow, fast, abrupt stop, and reverse.
+- Fine-pointer wheel/trackpad above and below 769 px: slow, fast, abrupt stop, and reverse without
+  losing the shared inertia owner during resize.
 - Stopped frames at start, middle, 95%, immediate cover trigger, and destination reveal.
 - First-load and internal-route entry: statement masks, stagger, scroll cue, and final resting frame.
 - 390 px and 430 px browser emulation: no horizontal overflow and native touch behavior.
