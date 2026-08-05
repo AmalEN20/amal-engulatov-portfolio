@@ -459,6 +459,8 @@
   }
 
   .metaObject {
+    right: clamp(16px, 2vw, 32px);
+    left: auto;
     width: clamp(250px, 22vw, 280px);
     height: auto;
   }
