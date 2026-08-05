@@ -10,7 +10,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 html[data-intro="active"] {
@@ -67,10 +67,42 @@ h2 {
 
 .site-brand {
   flex: 0 0 auto;
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: -.04em;
   text-decoration: none;
+  transition:
+    opacity 320ms ease,
+    transform 720ms cubic-bezier(.16, 1, .3, 1);
+}
+
+.site-brand,
+.site-nav nav a {
+  color: rgb(17 17 17 / 58%);
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: normal;
+}
+
+.site-brand {
+  font-weight: 350;
+}
+
+.site-nav nav a {
+  font-weight: 400;
+}
+
+.site-nav[data-home-route="true"] .site-brand {
+  animation: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, -115%, 0);
+  visibility: hidden;
+}
+
+html[data-home-hero="cleared"] .site-nav[data-home-route="true"] .site-brand {
+  animation: site-brand-home-in 920ms cubic-bezier(.16, 1, .3, 1) both;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0);
+  visibility: visible;
 }
 
 .site-nav nav {
@@ -82,8 +114,6 @@ h2 {
 .site-nav nav a {
   position: relative;
   padding: 4px 0;
-  color: rgb(17 17 17 / 58%);
-  font-size: 14px;
   text-decoration: none;
   transition: color 180ms ease;
 }
@@ -254,6 +284,17 @@ html[data-route-content="revealing"] .page-title-word {
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
+@keyframes site-brand-home-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -115%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @keyframes route-title-word-in {
   from { opacity: 0; transform: translate3d(0, 116%, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
@@ -378,6 +419,10 @@ html[data-route-content="revealing"] .page-title-word {
   .site-nav nav a {
     font-size: 13px;
   }
+
+  .site-brand {
+    font-size: 13px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -399,5 +444,14 @@ html[data-route-content="revealing"] .page-title-word {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .site-nav[data-home-route="true"] .site-brand {
+    animation: none !important;
+    opacity: 1 !important;
+    pointer-events: auto;
+    transition: none !important;
+    transform: none !important;
+    visibility: visible;
   }
 }

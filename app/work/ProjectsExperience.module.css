@@ -1,0 +1,432 @@
+.page {
+  min-height: 100svh;
+  overflow: clip;
+  background: #fff;
+  color: #111;
+}
+
+.experience {
+  --projects-entry-out: 0;
+  --projects-final-meta: 0;
+  background: #fff;
+}
+
+.scene {
+  position: relative;
+  min-height: 100svh;
+  outline: none;
+}
+
+.experience[data-motion="active"] .scene {
+  height: 620svh;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #fff;
+  isolation: isolate;
+}
+
+.experience[data-motion="active"] .stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+}
+
+.intro {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  pointer-events: none;
+  opacity: calc(1 - var(--projects-entry-out));
+  transform: translate3d(0, calc(var(--projects-entry-out) * -30px), 0);
+  will-change: opacity, transform;
+}
+
+.finalMeta {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: .66rem;
+  font-weight: 560;
+  letter-spacing: .075em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.titleWrap {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  right: clamp(24px, 6vw, 96px);
+  left: clamp(24px, 6vw, 96px);
+  place-items: center;
+  transform: translateY(-50%);
+}
+
+.editorialTitle {
+  width: min(100%, 34rem);
+  margin: 0;
+  font-size: clamp(1.75rem, 2.55vw, 2.8rem);
+  font-weight: 420;
+  letter-spacing: -.052em;
+  line-height: .98;
+  text-align: center;
+}
+
+.editorialTitle:focus-visible {
+  outline: 1px solid rgb(17 17 17 / 24%);
+  outline-offset: 9px;
+}
+
+.editorialLine {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 .18em;
+}
+
+.editorialMask,
+.scrollCueMask {
+  display: inline-block;
+  overflow: clip;
+  padding: .08em .025em;
+}
+
+.editorialWord,
+.scrollCueText {
+  display: block;
+  will-change: transform, opacity;
+}
+
+.experience[data-motion="active"] .editorialWord {
+  animation: projects-word-in 980ms cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(70ms + var(--statement-index) * 75ms);
+}
+
+.scrollCue {
+  position: absolute;
+  right: 24px;
+  bottom: clamp(30px, 5vh, 54px);
+  left: 24px;
+  margin: 0;
+  color: rgb(17 17 17 / 52%);
+  font-size: clamp(.74rem, .9vw, .88rem);
+  font-weight: 400;
+  letter-spacing: -.02em;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.experience[data-motion="active"] .scrollCueText {
+  animation: projects-cue-in 820ms 690ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+:global(html[data-intro="active"]) .experience[data-motion="active"] .editorialWord,
+:global(html[data-intro="active"]) .experience[data-motion="active"] .scrollCueText,
+:global(html[data-route-content="hidden"]) .experience[data-motion="active"] .editorialWord,
+:global(html[data-route-content="hidden"]) .experience[data-motion="active"] .scrollCueText {
+  animation-play-state: paused;
+}
+
+.cards {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.cardItem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  transform-origin: center;
+  transform-style: preserve-3d;
+  will-change: filter, opacity, transform;
+}
+
+.cardLink {
+  display: block;
+  border-radius: 14px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 6px;
+}
+
+.card {
+  overflow: hidden;
+  border: 1px solid rgb(17 17 17 / 15%);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 34px 82px rgb(0 0 0 / 12%);
+  transition: box-shadow 360ms ease, transform 520ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.cardLink:hover .card,
+.cardLink:focus-visible .card {
+  box-shadow: 0 46px 104px rgb(0 0 0 / 17%);
+  transform: translateY(-7px);
+}
+
+.cardVisual {
+  position: relative;
+  aspect-ratio: 1.85;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(17 17 17 / 12%);
+  background: #f3f3f3;
+  isolation: isolate;
+}
+
+.cardImage {
+  object-fit: cover;
+  transform: scale(1.002);
+  transition: transform 700ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.cardLink:hover .cardImage,
+.cardLink:focus-visible .cardImage {
+  transform: scale(1.035);
+}
+
+.cardMeta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: end;
+  padding: 20px;
+}
+
+.cardMeta p,
+.cardMeta h2 {
+  margin: 0;
+}
+
+.cardMeta p,
+.cardMeta > span {
+  color: rgb(17 17 17 / 52%);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: .56rem;
+  letter-spacing: .045em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.cardMeta h2 {
+  margin-top: 7px;
+  font-size: clamp(2.1rem, 3.6vw, 4rem);
+  font-weight: 450;
+  letter-spacing: -.065em;
+  line-height: .88;
+}
+
+.finalMeta {
+  position: absolute;
+  z-index: 6;
+  top: clamp(100px, 12vh, 130px);
+  right: clamp(22px, 3.2vw, 54px);
+  left: clamp(22px, 3.2vw, 54px);
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  color: rgb(17 17 17 / 54%);
+  opacity: var(--projects-final-meta);
+  pointer-events: none;
+  transform: translate3d(0, calc((1 - var(--projects-final-meta)) * 16px), 0);
+}
+
+.finalMeta p {
+  margin: 0;
+}
+
+.finalMeta p:last-child {
+  text-align: right;
+}
+
+.experience[data-motion="static"] {
+  padding: 150px 24px 70px;
+}
+
+.experience[data-motion="static"] .scene,
+.experience[data-motion="static"] .stage {
+  min-height: auto;
+  overflow: visible;
+}
+
+.experience[data-motion="static"] .stage {
+  display: block;
+}
+
+.experience[data-motion="static"] .intro {
+  position: relative;
+  display: grid;
+  gap: 24px;
+  opacity: 1;
+  transform: none;
+}
+
+.experience[data-motion="static"] .titleWrap,
+.experience[data-motion="static"] .scrollCue {
+  position: static;
+  width: 100%;
+  transform: none;
+}
+
+.experience[data-motion="static"] .scrollCue {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.experience[data-motion="static"] .cards {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 84px;
+  pointer-events: auto;
+}
+
+.experience[data-motion="static"] .cardItem {
+  position: static;
+  width: auto;
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+.experience[data-motion="static"] .finalMeta {
+  position: relative;
+  top: auto;
+  right: auto;
+  left: auto;
+  border-top: 1px solid rgb(17 17 17 / 14%);
+  margin-top: 52px;
+  padding-top: 18px;
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  .experience[data-motion="active"] .scene {
+    height: 460svh;
+  }
+
+  .experience[data-motion="active"] .stage {
+    perspective: 900px;
+  }
+
+  .titleWrap {
+    right: 14px;
+    left: 14px;
+  }
+
+  .editorialTitle {
+    width: min(100%, 22rem);
+    font-size: clamp(1.65rem, 7vw, 2.15rem);
+    letter-spacing: -.052em;
+    line-height: 1;
+  }
+
+  .scrollCue {
+    right: 16px;
+    bottom: 28px;
+    left: 16px;
+    font-size: .7rem;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .cardLink {
+    border-radius: 10px;
+  }
+
+  .cardMeta {
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .cardMeta p,
+  .cardMeta > span {
+    font-size: .46rem;
+  }
+
+  .cardMeta h2 {
+    font-size: clamp(1.8rem, 8vw, 2.5rem);
+  }
+
+  .finalMeta {
+    top: 88px;
+    right: 16px;
+    left: 16px;
+    font-size: .48rem;
+  }
+
+  .finalMeta p:last-child {
+    max-width: 12rem;
+  }
+
+  .experience[data-motion="static"] {
+    padding: 126px 16px 42px;
+  }
+
+  .experience[data-motion="static"] .editorialTitle {
+    font-size: clamp(1.65rem, 7vw, 2.15rem);
+  }
+
+  .experience[data-motion="static"] .cards {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 56px;
+  }
+
+  .experience[data-motion="static"] .finalMeta {
+    flex-direction: column;
+  }
+
+  .experience[data-motion="static"] .finalMeta p:last-child {
+    max-width: none;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorialWord,
+  .scrollCueText,
+  .card,
+  .stage {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+@keyframes projects-word-in {
+  from { transform: translate3d(0, 116%, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes projects-cue-in {
+  from { opacity: 0; transform: translate3d(0, 120%, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@media (forced-colors: active) {
+  .card,
+  .cardVisual {
+    border: 1px solid CanvasText;
+  }
+}

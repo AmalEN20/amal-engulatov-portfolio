@@ -1,0 +1,481 @@
+.hero {
+  --identity-offset: clamp(150px, 15.8vw, 220px);
+  --hero-progress: 0;
+  --work-offset: 112%;
+  --work-progress: 0;
+  position: relative;
+  min-height: 270svh;
+  background: #ffffff;
+  color: #111111;
+}
+
+.heroStage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  min-height: 680px;
+  overflow: hidden;
+  background: transparent;
+  color: #111111;
+  pointer-events: none;
+  transform-origin: center;
+  transition: opacity 260ms ease, transform 780ms cubic-bezier(.72, 0, .18, 1);
+}
+
+.heroScene,
+.workArrival {
+  position: absolute;
+  inset: 0;
+}
+
+.heroScene {
+  z-index: auto;
+}
+
+.identity {
+  position: absolute;
+  z-index: 3;
+  top: 48%;
+  right: clamp(40px, 5.4vw, 84px);
+  left: clamp(40px, 5.4vw, 84px);
+  transform: translateY(-50%);
+}
+
+.heroTitle {
+  position: relative;
+  width: 100%;
+  height: clamp(72px, 7.5vw, 112px);
+  margin: 0;
+  color: #111111;
+  font-family: var(--font-geist), Arial, sans-serif;
+}
+
+.titleMask {
+  position: absolute;
+  top: 50%;
+  display: block;
+  overflow: hidden;
+  padding: .08em .1em .2em;
+  transform: translateY(-50%);
+}
+
+.givenMask {
+  right: calc(50% + var(--identity-offset));
+}
+
+.surnameMask {
+  left: calc(50% + var(--identity-offset));
+}
+
+.titleWord {
+  display: block;
+  font-size: clamp(56px, 5.8vw, 86px);
+  font-variation-settings: "wght" 250;
+  font-weight: 250;
+  letter-spacing: -.055em;
+  line-height: 1.02;
+  transition: opacity 900ms ease, transform 1180ms cubic-bezier(.16, 1, .3, 1);
+  white-space: nowrap;
+}
+
+.portrait {
+  position: absolute !important;
+  z-index: 1;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  height: 100svh;
+  clip-path: inset(0 0 0 0);
+  mix-blend-mode: multiply;
+  transform: translate3d(-50%, 0, 0);
+  transform-origin: center bottom;
+  transition: clip-path 1180ms cubic-bezier(.16, 1, .3, 1);
+  will-change: clip-path, transform, opacity;
+}
+
+.workArrival {
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  opacity: var(--work-progress);
+  pointer-events: none;
+}
+
+.workTitle {
+  margin: 0;
+  color: #111111;
+  font-family: var(--font-geist), Arial, sans-serif;
+}
+
+.workTitleMask {
+  display: block;
+  overflow: hidden;
+  padding: .08em .08em .16em;
+}
+
+.workTitleWord {
+  display: block;
+  font-size: clamp(88px, 15vw, 220px);
+  font-variation-settings: "wght" 250;
+  font-weight: 250;
+  letter-spacing: -.07em;
+  line-height: .92;
+  transform: translate3d(0, var(--work-offset), 0);
+  will-change: transform;
+}
+
+.metaObject {
+  position: absolute;
+  z-index: 3;
+  top: 48%;
+  right: auto;
+  bottom: auto;
+  left: calc(50% + var(--identity-offset) + clamp(106px, 10.55vw, 156px) + 18px);
+  width: clamp(136px, 11vw, 160px);
+  height: 48px;
+  overflow: hidden;
+  font-family: var(--font-geist-mono), monospace;
+  perspective: 1000px;
+  transform: translate3d(0, -50%, 0);
+  transition: opacity 760ms ease, transform 940ms cubic-bezier(.16, 1, .3, 1);
+  will-change: transform, opacity;
+}
+
+.metaScene,
+.metaRotor {
+  width: 100%;
+  height: 100%;
+}
+
+.metaScene {
+  perspective: 1000px;
+}
+
+.metaRotor {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: meta-turn 18s linear infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+.metaFace {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.metaFront {
+  transform: rotateY(0deg);
+}
+
+.metaBack {
+  transform: rotateY(180deg);
+}
+
+.metaLabel {
+  display: block;
+  color: #9a9a9a;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.metaValueMask {
+  display: block;
+  height: 1.25em;
+  overflow: hidden;
+  color: #565656;
+  font-size: clamp(10px, .76vw, 12px);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  line-height: 1.25;
+}
+
+.metaValueTrack,
+.metaValue {
+  display: block;
+}
+
+.metaValueTrack {
+  animation-duration: 18s;
+  animation-iteration-count: infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+.basedValueTrack {
+  animation-name: based-values;
+}
+
+.focusValueTrack {
+  animation-name: focus-values;
+}
+
+.metaValue {
+  height: 1.25em;
+  white-space: nowrap;
+}
+
+.metaReduced {
+  display: none;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.hero[data-motion="waiting"] .titleWord {
+  opacity: 0;
+  transform: translate3d(0, 112%, 0);
+}
+
+.hero[data-motion="waiting"] .portrait {
+  clip-path: inset(100% 0 0 0);
+  opacity: 0;
+}
+
+.hero[data-motion="waiting"] .metaObject {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+}
+
+.hero[data-motion="entered"] .surnameWord {
+  transition-delay: 75ms;
+}
+
+.hero[data-motion="entered"] .portrait {
+  transition-delay: 145ms;
+}
+
+.hero[data-motion="entered"] .metaObject {
+  transition-delay: 390ms;
+}
+
+.hero[data-motion="entered"] .metaRotor,
+.hero[data-motion="entered"] .metaValueTrack {
+  animation-play-state: running;
+}
+
+.hero[data-erased="true"] .titleMask,
+.hero[data-erased="true"] .metaObject {
+  visibility: hidden;
+}
+
+@keyframes meta-turn {
+  0%, 40% {
+    transform: rotateY(0deg);
+    animation-timing-function: cubic-bezier(.76, 0, .2, 1);
+  }
+  47%, 86% {
+    transform: rotateY(180deg);
+    animation-timing-function: cubic-bezier(.76, 0, .2, 1);
+  }
+  93%, 100% {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes based-values {
+  0%, 12% {
+    transform: translate3d(0, 0, 0);
+    animation-timing-function: cubic-bezier(.76, 0, .2, 1);
+  }
+  18%, 84% {
+    transform: translate3d(0, -50%, 0);
+    animation-timing-function: cubic-bezier(.76, 0, .2, 1);
+  }
+  89%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes focus-values {
+  0%, 55% {
+    transform: translate3d(0, 0, 0);
+    animation-timing-function: cubic-bezier(.76, 0, .2, 1);
+  }
+  62%, 86% {
+    transform: translate3d(0, -50%, 0);
+    animation-timing-function: cubic-bezier(.76, 0, .2, 1);
+  }
+  91%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+:global(html[data-route-transition="covering"]) .heroStage {
+  opacity: .72;
+  transform: scale(.99);
+}
+
+@media (max-width: 720px) {
+  .hero {
+    --identity-offset: clamp(68px, 18vw, 82px);
+    min-height: 220svh;
+  }
+
+  .heroStage {
+    min-height: 720px;
+  }
+
+  .identity {
+    top: 31%;
+    right: 16px;
+    left: 16px;
+  }
+
+  .heroTitle {
+    height: clamp(42px, 11vw, 50px);
+  }
+
+  .titleWord {
+    font-size: clamp(29px, 7.6vw, 35px);
+    font-variation-settings: "wght" 240;
+    font-weight: 240;
+    letter-spacing: -.05em;
+  }
+
+  .portrait {
+    top: 24%;
+    left: 50%;
+    bottom: auto;
+    width: 100vw;
+    height: 100svh;
+    top: 0;
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  .metaObject {
+    top: calc(31% + 44px);
+    right: 16px;
+    bottom: auto;
+    left: auto;
+    width: clamp(136px, 38vw, 158px);
+    height: 46px;
+  }
+
+  .metaFace {
+    gap: 6px;
+    padding: 0;
+  }
+
+  .metaValueMask {
+    font-size: clamp(9px, 2.45vw, 11px);
+  }
+
+  .workTitleWord {
+    font-size: clamp(72px, 25vw, 112px);
+  }
+}
+
+@media (max-height: 700px) and (min-width: 721px) {
+  .heroStage {
+    min-height: 600px;
+  }
+
+  .identity {
+    top: 47%;
+  }
+
+  .titleWord {
+    font-size: clamp(54px, 5.5vw, 78px);
+  }
+
+  .portrait {
+    height: 76svh;
+  }
+
+  .metaObject {
+    top: 47%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    min-height: auto;
+  }
+
+  .heroStage {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .heroScene,
+  .workArrival {
+    position: relative;
+    min-height: 100svh;
+  }
+
+  .portrait,
+  .metaObject,
+  .titleWord {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .titleMask {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: translateY(-50%) !important;
+    transition: none !important;
+  }
+
+  .identity {
+    transform: translateY(-50%) !important;
+  }
+
+  .portrait {
+    position: absolute !important;
+    clip-path: none !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .workArrival,
+  .workTitleWord {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .metaObject {
+    width: clamp(250px, 22vw, 280px);
+    height: auto;
+  }
+
+  .metaScene {
+    display: none;
+  }
+
+  .metaReduced {
+    display: grid;
+    gap: 8px;
+    padding: 0;
+  }
+
+  .metaReduced > span {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+}

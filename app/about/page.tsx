@@ -1,9 +1,5 @@
-import { PageTitle } from "../components/PageTitle";
+import { AboutExperience } from "./AboutExperience";
 
 export default function AboutPage() {
-  return (
-    <main className="placeholder-page">
-      <PageTitle>About</PageTitle>
-    </main>
-  );
+  return <AboutExperience />;
 }

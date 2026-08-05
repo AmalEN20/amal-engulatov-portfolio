@@ -5,7 +5,6 @@ import type { CSSProperties } from "react";
 import { TransitionLink } from "./SiteShell";
 
 const links = [
-  { href: "/", label: "Home" },
   { href: "/work", label: "Projects" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
@@ -15,9 +14,14 @@ export function SiteNav() {
   const pathname = usePathname();
 
   return (
-    <header className="site-nav">
+    <header className="site-nav" data-home-route={pathname === "/" ? "true" : undefined}>
       <span className="nav-reveal-mask">
-        <TransitionLink className="site-brand nav-reveal-item" href="/" aria-label="Amal, home">
+        <TransitionLink
+          className="site-brand nav-reveal-item"
+          href="/"
+          aria-label="Amal, home"
+          aria-current={pathname === "/" ? "page" : undefined}
+        >
           Amal
         </TransitionLink>
       </span>

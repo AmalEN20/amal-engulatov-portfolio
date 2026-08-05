@@ -6,6 +6,32 @@ These instructions apply to the entire repository. Home, Projects/Work, project-
 
 Preserve the existing Amal identity and the current Next.js structure. Do not copy a reference site's branding, layout, assets, copy, typography, or signature visual device. Do not invent experience, results, clients, testimonials, or validation.
 
+## Browser ownership for research and QA
+
+When a task needs to open a live reference website, inspect visual behavior, audit motion, or test localhost, it must use its own Codex in-app Browser session.
+
+- Explicitly select the Codex in-app Browser for visual/UI work.
+- Do not open, control, reuse, or close tabs in Amal's external Chrome or Edge profile.
+- Do not depend on Amal's browser history, extensions, cookies, logins, or existing sessions.
+- Create separate reference and localhost tabs inside the task's in-app Browser, preserve unrelated user tabs, and close/finalize task-created research tabs after the audit.
+- Prefer a connector, API, or web search for non-visual factual research when it can answer the question without browser UI interaction.
+- Use external Chrome or Edge only when Amal explicitly asks for that exact browser in the current request.
+- If authentication is required, stop and ask Amal rather than silently switching to his personal browser.
+
+## Typography direction from Evele — Main
+
+Use the typography and font-styling principles from the current Evele — Main website as the shared reference for every Portfolio route. This direction applies to type only, never to Evele's colors, gradients, backgrounds, strokes, or other visual identity.
+
+- Use Geist Sans for body copy, navigation, and general interface text.
+- Use Geist Mono for compact labels, indices, metadata, technical annotations, and restrained uppercase microcopy with deliberate tracking.
+- Reserve IBM Plex Sans Condensed or an equivalent shared condensed display token for selected large editorial moments; do not use it everywhere.
+- Display headings should feel oversized and tightly composed: generally medium/regular weight, compact line-height, and strong negative tracking comparable to Evele's typographic rhythm.
+- Body copy should remain calm and readable with substantially looser line-height and neutral tracking.
+- Create contrast through scale, width, rhythm, spacing, and font role—not by importing Evele's color palette.
+- Keep responsive line breaks intentional. Avoid clipped descenders, unsafe masks, and unreadably compressed mobile headings.
+- Shared font registration and global typography tokens belong to Portfolio — Main. Page tasks must not independently edit root layout or install competing font systems.
+- Do not copy Evele text, exact compositions, colors, or branded visual treatments. Adapt only its typographic hierarchy and discipline to Amal's portfolio identity.
+
 ## Global motion principle
 
 Motion is part of the information architecture, not optional decoration. Every intentional content group must have a designed entry, readable resting state, and exit response.
