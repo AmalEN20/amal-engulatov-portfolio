@@ -1,5 +1,6 @@
 "use client";
 
+import Lenis from "lenis";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -102,8 +103,24 @@ export function SiteShell({
   const router = useRouter();
   const requestId = useRef(0);
   const transitionLocked = useRef(false);
+  const lenisRef = useRef<Lenis | null>(null);
+  const lenisFrame = useRef<number | null>(null);
   const previousPathname = useRef(pathname);
   const [transition, setTransition] = useState<TransitionState>(initialTransition);
+
+  const scrollDestinationToTop = useCallback(() => {
+    const root = document.documentElement;
+    const body = document.body;
+    const rootScrollBehavior = root.style.scrollBehavior;
+    const bodyScrollBehavior = body.style.scrollBehavior;
+
+    root.style.scrollBehavior = "auto";
+    body.style.scrollBehavior = "auto";
+    lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    root.style.scrollBehavior = rootScrollBehavior;
+    body.style.scrollBehavior = bodyScrollBehavior;
+  }, []);
 
   const focusPageHeading = useCallback(() => {
     window.requestAnimationFrame(() => {
@@ -126,13 +143,12 @@ export function SiteShell({
     (href: string, label: string) => {
       if (transitionLocked.current || href === pathname) return;
 
-      window.scrollTo(0, 0);
-
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         router.push(href);
         return;
       }
 
+      lenisRef.current?.stop();
       transitionLocked.current = true;
       requestId.current += 1;
       setTransition({
@@ -144,6 +160,76 @@ export function SiteShell({
     },
     [pathname, router],
   );
+
+  useEffect(() => {
+    const desktopPointer = window.matchMedia("(min-width: 769px) and (pointer: fine)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const destroyLenis = () => {
+      if (lenisFrame.current !== null) {
+        window.cancelAnimationFrame(lenisFrame.current);
+        lenisFrame.current = null;
+      }
+      lenisRef.current?.destroy();
+      lenisRef.current = null;
+    };
+
+    const syncLenis = () => {
+      destroyLenis();
+      const touchCapable = navigator.maxTouchPoints > 0;
+      if (!desktopPointer.matches || reducedMotion.matches || touchCapable) return;
+
+      const isMac = /Mac/i.test(navigator.platform);
+
+      const lenis = new Lenis({
+        autoRaf: false,
+        duration: 1.05,
+        easing: (t) => 1 - Math.pow(1 - t, 3),
+        lerp: 0.105,
+        smoothWheel: true,
+        syncTouch: false,
+        wheelMultiplier: isMac ? 0.6 : 0.85,
+        gestureOrientation: "vertical",
+      });
+
+      lenisRef.current = lenis;
+      if (transitionLocked.current) lenis.stop();
+
+      const frame = (time: number) => {
+        lenis.raf(time);
+        lenisFrame.current = window.requestAnimationFrame(frame);
+      };
+      lenisFrame.current = window.requestAnimationFrame(frame);
+    };
+
+    syncLenis();
+    desktopPointer.addEventListener("change", syncLenis);
+    reducedMotion.addEventListener("change", syncLenis);
+
+    return () => {
+      desktopPointer.removeEventListener("change", syncLenis);
+      reducedMotion.removeEventListener("change", syncLenis);
+      destroyLenis();
+    };
+  }, []);
+
+  useEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (transition.phase === "idle") {
+      lenisRef.current?.start();
+      return;
+    }
+
+    lenisRef.current?.stop();
+  }, [transition.phase]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -169,8 +255,7 @@ export function SiteShell({
       setTransition((current) =>
         current.requestId === activeRequest ? { ...current, phase: "covered" } : current,
       );
-      window.scrollTo(0, 0);
-      router.push(href);
+      router.push(href, { scroll: false });
     }, 780);
 
     return () => window.clearTimeout(coverTimer);
@@ -179,6 +264,7 @@ export function SiteShell({
   useEffect(() => {
     if (transition.phase !== "covered" || pathname !== transition.href) return;
 
+    scrollDestinationToTop();
     const activeRequest = transition.requestId;
     const revealTimer = window.setTimeout(() => {
       document.documentElement.dataset.routeContent = "revealing";
@@ -188,7 +274,7 @@ export function SiteShell({
     }, 60);
 
     return () => window.clearTimeout(revealTimer);
-  }, [pathname, transition]);
+  }, [pathname, scrollDestinationToTop, transition]);
 
   useEffect(() => {
     if (transition.phase !== "revealing") return;
@@ -217,8 +303,11 @@ export function SiteShell({
   useEffect(() => {
     if (previousPathname.current === pathname) return;
     previousPathname.current = pathname;
-    if (!transitionLocked.current) focusPageHeading();
-  }, [focusPageHeading, pathname]);
+    if (transitionLocked.current) return;
+
+    scrollDestinationToTop();
+    focusPageHeading();
+  }, [focusPageHeading, pathname, scrollDestinationToTop]);
 
   return (
     <TransitionContext.Provider value={{ navigate, pathname }}>
