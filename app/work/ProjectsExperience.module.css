@@ -5,9 +5,26 @@
   color: #111;
 }
 
+:global(html:has([data-projects-stage]) .site-nav) {
+  background: transparent;
+  backdrop-filter: none;
+  mix-blend-mode: difference;
+}
+
+:global(html:has([data-projects-stage]) .site-nav .site-brand),
+:global(html:has([data-projects-stage]) .site-nav nav a) {
+  color: rgb(255 255 255 / 58%);
+}
+
+:global(html:has([data-projects-stage]) .site-nav nav a:hover),
+:global(html:has([data-projects-stage]) .site-nav nav a[aria-current="page"]) {
+  color: #fff;
+}
+
 .experience {
   --projects-entry-out: 0;
-  --projects-final-meta: 0;
+  --projects-card-gap: min(1.8vw, 30px);
+  --projects-card-width: min(42vw, 600px);
   background: #fff;
 }
 
@@ -48,15 +65,6 @@
   will-change: opacity, transform;
 }
 
-.finalMeta {
-  font-family: var(--font-geist-mono), monospace;
-  font-size: .66rem;
-  font-weight: 560;
-  letter-spacing: .075em;
-  line-height: 1.45;
-  text-transform: uppercase;
-}
-
 .titleWrap {
   position: absolute;
   top: 50%;
@@ -68,12 +76,12 @@
 }
 
 .editorialTitle {
-  width: min(100%, 34rem);
+  width: min(100%, 28rem);
   margin: 0;
-  font-size: clamp(1.75rem, 2.55vw, 2.8rem);
-  font-weight: 420;
-  letter-spacing: -.052em;
-  line-height: .98;
+  font-size: clamp(1.38rem, 1.9vw, 2.05rem);
+  font-weight: 350;
+  letter-spacing: -.045em;
+  line-height: 1;
   text-align: center;
 }
 
@@ -110,7 +118,7 @@
 .scrollCue {
   position: absolute;
   right: 24px;
-  bottom: clamp(30px, 5vh, 54px);
+  top: calc(50% + clamp(32px, 3.5vw, 46px));
   left: 24px;
   margin: 0;
   color: rgb(17 17 17 / 52%);
@@ -122,7 +130,23 @@
 }
 
 .experience[data-motion="active"] .scrollCueText {
-  animation: projects-cue-in 820ms 690ms cubic-bezier(.16, 1, .3, 1) both;
+  background: linear-gradient(
+    90deg,
+    rgb(17 17 17 / 52%) 0%,
+    rgb(17 17 17 / 52%) 36%,
+    #b4b4b4 50%,
+    rgb(17 17 17 / 52%) 64%,
+    rgb(17 17 17 / 52%) 100%
+  );
+  background-position: -180% 50%;
+  background-size: 240% 100%;
+  background-clip: text;
+  color: transparent;
+  animation:
+    projects-cue-in 820ms 690ms cubic-bezier(.16, 1, .3, 1) both,
+    projects-cue-gradient-loop 3.8s 1510ms linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 :global(html[data-intro="active"]) .experience[data-motion="active"] .editorialWord,
@@ -171,7 +195,7 @@
   border: 1px solid rgb(17 17 17 / 15%);
   border-radius: 14px;
   background: #fff;
-  box-shadow: 0 34px 82px rgb(0 0 0 / 12%);
+  box-shadow: 0 18px 44px rgb(0 0 0 / 7.5%);
   transition: box-shadow 360ms ease, transform 520ms cubic-bezier(.22, 1, .36, 1);
 }
 
@@ -181,7 +205,7 @@
 
 .cardLink:hover .card,
 .cardLink:focus-visible .card {
-  box-shadow: 0 46px 104px rgb(0 0 0 / 17%);
+  box-shadow: 0 26px 62px rgb(0 0 0 / 11%);
   transform: translateY(-7px);
 }
 
@@ -200,6 +224,21 @@
   transition: transform 700ms cubic-bezier(.22, 1, .36, 1);
 }
 
+.cardItem[data-project-slug="amal-ai-studio"] .cardVisual {
+  background: #e9e9e7;
+}
+
+.cardItem[data-project-slug="amal-ai-studio"] .cardImage {
+  object-fit: contain;
+  object-position: center;
+  transform: scale(.96);
+}
+
+.cardItem[data-project-slug="amal-ai-studio"] .cardLink:hover .cardImage,
+.cardItem[data-project-slug="amal-ai-studio"] .cardLink:focus-visible .cardImage {
+  transform: scale(1);
+}
+
 .cardLink:hover .cardImage,
 .cardLink:focus-visible .cardImage {
   transform: scale(1.035);
@@ -210,6 +249,7 @@
   grid-template-columns: 1fr auto;
   gap: 18px;
   align-items: end;
+  background: #f5f5f5;
   padding: 20px;
 }
 
@@ -247,11 +287,11 @@
 
 .cardMeta h2 {
   position: relative;
-  margin-top: 7px;
-  font-size: clamp(1.8rem, 2.8vw, 3.1rem);
+  margin-top: 6px;
+  font-size: clamp(1.45rem, 2.15vw, 2.45rem);
   font-weight: 400;
   letter-spacing: -.055em;
-  line-height: .94;
+  line-height: .98;
 }
 
 .cardTitleGradient {
@@ -262,18 +302,18 @@
     90deg,
     #111 0%,
     #111 35%,
-    #a7a7a7 50%,
+    #bcbcbc 50%,
     #111 65%,
     #111 100%
   );
-  background-position: -180% 50%;
+  background-position: 78% 50%;
   background-size: 240% 100%;
   background-clip: text;
   color: transparent;
   opacity: 0;
   pointer-events: none;
-  animation: card-title-gradient-loop 3.4s linear infinite paused;
-  transition: opacity 220ms ease;
+  transition: opacity 160ms cubic-bezier(.22, 1, .36, 1);
+  transition-delay: 0ms;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -281,78 +321,24 @@
 @media (hover: hover) and (pointer: fine) {
   .cardLink:hover .cardTitleGradient {
     opacity: 1;
-    animation-play-state: running;
+    animation: card-title-gradient-loop 2.6s linear infinite;
+    transition-delay: 35ms;
   }
 }
 
 .cardLink:focus-visible .cardTitleGradient {
   opacity: 1;
-  animation-play-state: running;
-}
-
-.finalMeta {
-  position: absolute;
-  z-index: 6;
-  top: clamp(100px, 12vh, 130px);
-  right: clamp(22px, 3.2vw, 54px);
-  left: clamp(22px, 3.2vw, 54px);
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  color: rgb(17 17 17 / 54%);
-  opacity: var(--projects-final-meta);
-  pointer-events: none;
-  transform: translate3d(0, calc((1 - var(--projects-final-meta)) * 16px), 0);
-}
-
-.finalMeta p {
-  margin: 0;
-}
-
-.finalMetaText {
-  display: inline-block;
-  background: linear-gradient(
-    90deg,
-    rgb(17 17 17 / 54%) 0%,
-    rgb(17 17 17 / 54%) 38%,
-    #a7a7a7 50%,
-    rgb(17 17 17 / 54%) 62%,
-    rgb(17 17 17 / 54%) 100%
-  );
-  background-position: -180% 50%;
-  background-size: 240% 100%;
-  background-clip: text;
-  color: transparent;
-  animation: final-meta-gradient-loop 3.8s linear infinite paused;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.finalMetaText:last-child {
-  animation-delay: -1.9s;
-}
-
-.experience[data-phase="hold"] .finalMetaText {
-  animation-play-state: running;
-}
-
-.experience[data-return-entry="true"] .finalMeta {
-  animation: projects-return-meta-in 720ms 220ms cubic-bezier(.16, 1, .3, 1) both;
+  animation: card-title-gradient-loop 2.6s linear infinite;
+  transition-delay: 35ms;
 }
 
 :global(html[data-intro="active"]) .experience[data-return-entry="true"] .card,
 :global(html[data-intro="active"]) .experience[data-return-entry="true"] .cardCopy,
 :global(html[data-intro="active"]) .experience[data-return-entry="true"] .cardYear,
-:global(html[data-intro="active"]) .experience[data-return-entry="true"] .finalMeta,
 :global(html[data-route-content="hidden"]) .experience[data-return-entry="true"] .card,
 :global(html[data-route-content="hidden"]) .experience[data-return-entry="true"] .cardCopy,
-:global(html[data-route-content="hidden"]) .experience[data-return-entry="true"] .cardYear,
-:global(html[data-route-content="hidden"]) .experience[data-return-entry="true"] .finalMeta {
+:global(html[data-route-content="hidden"]) .experience[data-return-entry="true"] .cardYear {
   animation-play-state: paused;
-}
-
-.finalMeta p:last-child {
-  text-align: right;
 }
 
 .experience[data-motion="static"] {
@@ -406,18 +392,6 @@
   transform: none;
 }
 
-.experience[data-motion="static"] .finalMeta {
-  position: relative;
-  top: auto;
-  right: auto;
-  left: auto;
-  border-top: 1px solid rgb(17 17 17 / 14%);
-  margin-top: 52px;
-  padding-top: 18px;
-  opacity: 1;
-  transform: none;
-}
-
 @media (max-width: 720px) {
   .experience[data-motion="active"] .scene {
     height: 460svh;
@@ -434,14 +408,14 @@
 
   .editorialTitle {
     width: min(100%, 22rem);
-    font-size: clamp(1.65rem, 7vw, 2.15rem);
-    letter-spacing: -.052em;
+    font-size: clamp(1.25rem, 5vw, 1.65rem);
+    letter-spacing: -.045em;
     line-height: 1;
   }
 
   .scrollCue {
     right: 16px;
-    bottom: 28px;
+    top: calc(50% + 38px);
     left: 16px;
     font-size: .7rem;
   }
@@ -465,18 +439,7 @@
   }
 
   .cardMeta h2 {
-    font-size: clamp(1.55rem, 6.5vw, 2.05rem);
-  }
-
-  .finalMeta {
-    top: 88px;
-    right: 16px;
-    left: 16px;
-    font-size: .48rem;
-  }
-
-  .finalMeta p:last-child {
-    max-width: 12rem;
+    font-size: clamp(1.3rem, 5.4vw, 1.7rem);
   }
 
   .experience[data-motion="static"] {
@@ -484,7 +447,7 @@
   }
 
   .experience[data-motion="static"] .editorialTitle {
-    font-size: clamp(1.65rem, 7vw, 2.15rem);
+    font-size: clamp(1.25rem, 5vw, 1.65rem);
   }
 
   .experience[data-motion="static"] .cards {
@@ -493,14 +456,6 @@
     margin-top: 56px;
   }
 
-  .experience[data-motion="static"] .finalMeta {
-    flex-direction: column;
-  }
-
-  .experience[data-motion="static"] .finalMeta p:last-child {
-    max-width: none;
-    text-align: left;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -525,14 +480,16 @@
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-@keyframes final-meta-gradient-loop {
+@keyframes projects-cue-gradient-loop {
   from { background-position: -180% 50%; }
   to { background-position: 180% 50%; }
 }
 
 @keyframes card-title-gradient-loop {
-  from { background-position: 180% 50%; }
-  to { background-position: -180% 50%; }
+  0% { background-position: 78% 50%; }
+  48% { background-position: 15% 50%; }
+  48.01% { background-position: 105% 50%; }
+  100% { background-position: 15% 50%; }
 }
 
 @keyframes projects-return-curtain {
@@ -545,15 +502,9 @@
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-@keyframes projects-return-meta-in {
-  from { clip-path: inset(0 0 100% 0); transform: translate3d(0, 12px, 0); }
-  to { clip-path: inset(0); transform: translate3d(0, 0, 0); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .cardCopy,
-  .cardYear,
-  .finalMeta {
+  .cardYear {
     animation: none !important;
     clip-path: none !important;
     opacity: 1 !important;
@@ -566,10 +517,9 @@
     transition: none !important;
   }
 
-  .finalMetaText {
+  .scrollCueText {
     background: none;
-    color: rgb(17 17 17 / 54%);
-    animation: none !important;
+    color: rgb(17 17 17 / 52%);
     -webkit-text-fill-color: currentColor;
   }
 }

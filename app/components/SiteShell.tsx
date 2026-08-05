@@ -162,7 +162,10 @@ export function SiteShell({
   );
 
   useEffect(() => {
-    const desktopPointer = window.matchMedia("(min-width: 769px) and (pointer: fine)");
+    // Wheel/trackpad inertia belongs to the input, not to a viewport breakpoint.
+    // Keeping the fine-pointer owner alive at narrow widths prevents a resize from
+    // silently changing the feel of every scroll-driven scene.
+    const finePointer = window.matchMedia("(pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const destroyLenis = () => {
@@ -176,8 +179,7 @@ export function SiteShell({
 
     const syncLenis = () => {
       destroyLenis();
-      const touchCapable = navigator.maxTouchPoints > 0;
-      if (!desktopPointer.matches || reducedMotion.matches || touchCapable) return;
+      if (!finePointer.matches || reducedMotion.matches) return;
 
       const isMac = /Mac/i.test(navigator.platform);
 
@@ -203,11 +205,11 @@ export function SiteShell({
     };
 
     syncLenis();
-    desktopPointer.addEventListener("change", syncLenis);
+    finePointer.addEventListener("change", syncLenis);
     reducedMotion.addEventListener("change", syncLenis);
 
     return () => {
-      desktopPointer.removeEventListener("change", syncLenis);
+      finePointer.removeEventListener("change", syncLenis);
       reducedMotion.removeEventListener("change", syncLenis);
       destroyLenis();
     };

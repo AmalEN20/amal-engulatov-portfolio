@@ -12,19 +12,32 @@ cell/grid pattern competes with the work.
 1. The shared route surface resolves into the white page.
 2. The compact, centered statement `I like making new things.` rises word by word from clipped
    masks. The five-word reveal uses a 75 ms stagger and completes in about 1.1 seconds. Its scale
-   remains deliberately quiet so it introduces the work without behaving like a hero billboard.
-3. `Scroll to see` follows as a thin secondary cue after the first statement words are readable.
+   is reduced by a further 10-12% from the previous approved composition and its weight moves from
+   420 to 350, so it feels lighter and more consistent with the portfolio's quiet typographic
+   hierarchy without behaving like a hero billboard.
+3. `Scroll to see` sits directly beneath the statement and follows as a thin secondary cue after
+   the first words are readable. A restrained 3.8-second gray highlight travels across the cue
+   from left to right and loops without changing its semantic text.
 4. On scroll, the statement recedes as the first wide project card approaches from depth.
 5. The second wide card follows with a controlled stagger; both settle into a stable pair.
 6. On a fine pointer, hovering either settled card preserves its existing lift and image scale while
-   a measured 3.4-second gray highlight loops across only the project title, matching the detail
-   metadata loop's linear pacing while retaining left-to-right travel. The overlay fades in and
-   out over 220 ms, and pauses at its current frame as soon as the pointer leaves. Keyboard
-   `focus-visible` receives the same title response.
+   a 2.6-second gray highlight loops across only the project title. Every pointer entry begins the
+   first wave directly on the left edge of the first letters, waits 35 ms, then eases the overlay to
+   full opacity over 160 ms while that wave is already moving across the title. This creates a small,
+   intentional softness without restoring the previous perceptible off-text delay. Later waves reset
+   just outside the left edge and cross the text again. The project titles are reduced by about one
+   fifth and use a calmer line height. Keyboard `focus-visible` receives the same title response.
 
 The masked text reveal is the one time-based page-entry sequence. It waits behind the shared
 first-load curtain or covered route state. The card choreography remains driven only by the
 page's normalized scroll progress.
+
+While the Projects stage is mounted, the shared navigation keeps its fixed position, links, and
+stacking order but its white translucent backdrop and blur are locally suppressed. Cards can
+therefore remain fully visible while travelling behind the navigation content, without a horizontal
+header edge masking the upper part of their arc. A Projects-local difference blend keeps the brand
+and navigation links readable as the background changes from white page to dark project media. No
+shared navigation component or global token is changed.
 
 ## 3. Scroll interval and stopped frames
 
@@ -35,7 +48,6 @@ The desktop scene is one sticky interval with normalized progress `p` from 0 to 
 | Statement | 0.00-0.22 | The complete motivation statement and scroll cue remain readable before receding. |
 | Evele Studio | 0.30-0.62 | The studio website approaches from depth and settles into its final position. |
 | Amal AI Studio | 0.42-0.74 | The client acquisition OS follows with a restrained stagger. |
-| Metadata | 0.70-0.84 | The selected-work label and availability note resolve. |
 | Hold | 0.80-1.00 | Both links are stable, focusable, and readable. |
 
 ## 4. Exit and reverse behavior
@@ -61,8 +73,7 @@ The final-hold return has its own destination entry, coordinated with the existi
 both cards are already in their final positions under full cover, then a white curtain exposes the
 complete frames of both cards from top to bottom together over 840 ms, including border, shadow,
 image, and metadata surface. Category/title and year rise as accessible block groups in sync after
-the shared curtain begins to clear, and
-the final metadata enters through one restrained block mask. These CSS animations pause while
+the shared curtain begins to clear. These CSS animations pause while
 `data-route-content="hidden"` and start only in the shared revealing phase. They do not alter the
 ordinary scroll-driven card assembly.
 
@@ -71,8 +82,13 @@ ordinary scroll-driven card assembly.
 - Semantic copy and cards: DOM/CSS.
 - Progress mapping: one passive window scroll listener scheduled through one page-owned RAF.
 - Route state: existing shared `SiteShell` only.
+- Navigation overlap: one Projects-scoped CSS override removes only the shared nav's backdrop and
+  blur while `[data-projects-stage]` exists; navigation content remains above the cards at its
+  existing global z-index and uses a local contrast blend for legibility.
 - Project media: responsive Next.js images sourced from real local project screenshots.
 - Entry text: semantic DOM with clipped word/block masks and CSS animations.
+- Scroll cue highlight: CSS background clipping on the existing semantic text; reduced motion
+  removes the loop and renders the cue as solid gray.
 - Return card curtains and metadata masks: CSS clipping on each complete card plus semantic DOM block wrappers;
   no new observer, timer, or animation-frame owner.
 - Project-title hover: an `aria-hidden` CSS overlay inside the unchanged semantic heading; no
@@ -80,6 +96,13 @@ ordinary scroll-driven card assembly.
   without duplicating the accessible project name.
 - No SVG, Canvas, WebGL, video, added smooth-scroll instance, or new motion dependency.
 - No decorative sphere, turbine, wheel, page grid, or card cell pattern.
+- The page, scene, and stage remain pure white. Card shadows stay compact enough that they do not
+  tint the surrounding page; card metadata panels use neutral `#f5f5f5`, visibly lighter than the
+  previous warm gray.
+- The visible `Selected projects` and availability-note elements are both intentionally absent; the
+  final hold contains only the two project cards.
+- The Amal AI Studio overview image uses a contained fit so the full 16:10 source remains legible
+  inside the wider card frame instead of being aggressively cropped.
 
 The implementation transfers only the controlled project assembly and reversible spatial pacing
 of the reference. It does not copy the reference's signature object, palette, copy, layout,
@@ -87,8 +110,10 @@ assets, or brand identity.
 
 ## 6. Desktop, mobile, and reduced motion
 
-- Desktop/trackpad: deliberate sticky interval; two landscape cards settle side by side.
-- Mobile/touch: shorter interval, native touch scrolling, and the two landscape cards settle
+- Fine-pointer wheel/trackpad at every viewport width: deliberate sticky interval with the shared
+  inertia owner; two landscape cards settle side by side on the desktop composition and vertically
+  on the narrow composition.
+- Mobile/touch: shorter interval, native touch momentum, and the two landscape cards settle
   vertically inside the final frame.
 - Reduced motion: no sticky interval, inertia, parallax, pin, or staged reveal. The heading and
   both links render immediately in normal document flow. Project titles remain solid black with no
@@ -107,15 +132,24 @@ assets, or brand identity.
 
 ## 8. Acceptance checks
 
-- Desktop wheel/trackpad: slow, fast, abrupt stop, and reverse.
+- Fine-pointer wheel/trackpad above and below 769 px: slow, fast, abrupt stop, and reverse without
+  losing the shared inertia owner during resize.
 - Stopped frames at start, middle, 95%, immediate cover trigger, and destination reveal.
+- Early/middle card arc: the complete card remains visible behind the navigation content with no
+  straight white header edge or blur boundary cutting through it; reverse scroll restores the same
+  unobstructed frames.
 - First-load and internal-route entry: statement masks, stagger, scroll cue, and final resting frame.
+- Intro resting frame: the smaller statement remains centered and `Scroll to see` sits immediately
+  beneath it with a readable looping gray highlight.
+- Final resting frame: only the two project cards remain; no selected-work or future-case-study
+  label appears above, between, or below them.
 - 390 px and 430 px browser emulation: no horizontal overflow and native touch behavior.
 - Keyboard: card links remain unreachable before the visual handoff and reachable in final hold;
   visible focus is retained, and title feedback matches pointer hover without replacing the focus
   outline.
 - Fine-pointer hover: the card lift and image scale remain intact; the title loop starts only while
-  hovered, fades both ways, and stops immediately after pointer exit.
+  hovered; after a 35 ms micro-pause, its first wave fades in smoothly for 160 ms while already
+  moving across the first letters, and the overlay eases out without delay after pointer exit.
 - Reduced motion: all project information and links are immediately available.
 - Repeated project navigation, Back/Forward, scroll reset, focus restoration, and duplicate click.
 - Detail `Back to projects`: destination mounts at the final two-card hold under cover, with no
