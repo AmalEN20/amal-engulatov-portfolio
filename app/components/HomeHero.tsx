@@ -7,11 +7,12 @@ import styles from "./HomeHero.module.css";
 
 type MotionState = "static" | "waiting" | "entered";
 
-const PARTICLE_SCATTER_START = 0.1;
-const IDENTITY_ERASE_END = 0.6;
-const WORK_REVEAL_START = 0.68;
-const WORK_REVEAL_END = 0.82;
-const NAV_BRAND_REVEAL = 0.605;
+const PARTICLE_SCATTER_START = 0.025;
+const PARTICLE_SCATTER_END = 0.525;
+const IDENTITY_ERASE_END = 0.231;
+const WORK_REVEAL_START = 0.605;
+const WORK_REVEAL_END = 0.745;
+const NAV_BRAND_REVEAL = 0.53;
 
 export function HomeHero() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -109,7 +110,7 @@ export function HomeHero() {
       hero.style.setProperty("--work-offset", `${((1 - workProgress) * 112).toFixed(2)}%`);
       hero.style.setProperty("--work-progress", workProgress.toFixed(4));
       hero.dataset.particles =
-        progress >= PARTICLE_SCATTER_START && progress < IDENTITY_ERASE_END
+        progress >= PARTICLE_SCATTER_START && progress < PARTICLE_SCATTER_END
           ? "active"
           : "idle";
       hero.dataset.erased = progress >= IDENTITY_ERASE_END ? "true" : "false";

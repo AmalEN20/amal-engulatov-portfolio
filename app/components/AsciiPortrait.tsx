@@ -8,17 +8,71 @@ import styles from "./AsciiPortrait.module.css";
 
 const SOURCE = "/amal-portrait-ascii.jpg";
 const GLYPHS = " .:-=+*#%@";
+const SCATTER_RAW_START = 0.025;
+const SCATTER_RAW_END = 0.525;
+const TRAJECTORY_LOCK_RAW_PROGRESS = 0.231;
+const TRAJECTORY_LOCK_LINEAR =
+  (TRAJECTORY_LOCK_RAW_PROGRESS - SCATTER_RAW_START) /
+  (SCATTER_RAW_END - SCATTER_RAW_START);
+const TRAJECTORY_LOCK_PROGRESS =
+  TRAJECTORY_LOCK_LINEAR *
+  TRAJECTORY_LOCK_LINEAR *
+  (3 - 2 * TRAJECTORY_LOCK_LINEAR);
+const TRAJECTORY_LOCK_ARC = Math.sin(TRAJECTORY_LOCK_PROGRESS * Math.PI);
+const TRAJECTORY_LOCK_REMAINDER = 1 - TRAJECTORY_LOCK_PROGRESS;
 const subscribeToClient = () => () => {};
 
 type Sample = {
   column: number;
+  continuationDirectionX: number;
+  continuationDirectionY: number;
+  continuationDistance: number;
+  continuationInitialRate: number;
+  continuesAfterLock: boolean;
   darkness: number;
   glyphIndex: number;
+  lockOffsetX: number;
+  lockOffsetY: number;
   row: number;
   scatterCurveX: number;
   scatterCurveY: number;
   scatterX: number;
   scatterY: number;
+};
+
+const getSamplePosition = (
+  sample: Sample,
+  progress: number,
+  baseX: number,
+  baseY: number,
+) => {
+  if (progress <= TRAJECTORY_LOCK_PROGRESS) {
+    const arc = Math.sin(progress * Math.PI);
+
+    return {
+      x: baseX + sample.scatterX * progress + sample.scatterCurveX * arc,
+      y: baseY + sample.scatterY * progress + sample.scatterCurveY * arc,
+    };
+  }
+
+  const continuationProgress =
+    (progress - TRAJECTORY_LOCK_PROGRESS) / TRAJECTORY_LOCK_REMAINDER;
+  const continuationDistance =
+    sample.continuationInitialRate * continuationProgress +
+    (sample.continuationDistance - sample.continuationInitialRate) *
+      continuationProgress *
+      continuationProgress;
+
+  return {
+    x:
+      baseX +
+      sample.lockOffsetX +
+      sample.continuationDirectionX * continuationDistance,
+    y:
+      baseY +
+      sample.lockOffsetY +
+      sample.continuationDirectionY * continuationDistance,
+  };
 };
 
 type EraseRect = {
@@ -57,6 +111,7 @@ export function AsciiPortrait({
     const sampleContext = sampleCanvas.getContext("2d", { willReadFrequently: true });
 
     let animationFrame = 0;
+    const frameInterval = coarsePointer.matches ? 24 : 16;
     let lastFrame = 0;
     let isVisible = true;
     let eraseRects: EraseRect[] = [];
@@ -116,17 +171,29 @@ export function AsciiPortrait({
       const rawScrollProgress = reducedMotion.matches
         ? 0
         : Math.min(1, Math.max(0, scrollProgressRef?.current ?? 0));
-      const scatterLinear = Math.min(1, Math.max(0, (rawScrollProgress - 0.1) / 0.5));
+      const scatterLinear = Math.min(
+        1,
+        Math.max(
+          0,
+          (rawScrollProgress - SCATTER_RAW_START) /
+            (SCATTER_RAW_END - SCATTER_RAW_START),
+        ),
+      );
       const scatterProgress = scatterLinear * scatterLinear * (3 - 2 * scatterLinear);
-      const scatterArc = Math.sin(scatterProgress * Math.PI);
-      const fadeLinear = Math.min(1, Math.max(0, (rawScrollProgress - 0.52) / 0.08));
-      const scatterFade = fadeLinear * fadeLinear * (3 - 2 * fadeLinear);
-      if (rawScrollProgress >= 0.095 && rawScrollProgress < 0.6) {
+      if (rawScrollProgress >= SCATTER_RAW_END) {
+        canvas.style.zIndex = "2";
+        context.globalAlpha = 1;
+        return;
+      }
+
+      if (rawScrollProgress >= SCATTER_RAW_START - 0.005 && rawScrollProgress < SCATTER_RAW_END) {
         updateEraseRects();
       }
 
       canvas.style.zIndex =
-        rawScrollProgress >= 0.1 && rawScrollProgress < 0.6 ? "160" : "2";
+        rawScrollProgress >= SCATTER_RAW_START && rawScrollProgress < SCATTER_RAW_END
+          ? "160"
+          : "2";
 
       if (animate) {
         const response = pointerTarget > pointer.strength ? 0.075 : 0.032;
@@ -138,7 +205,14 @@ export function AsciiPortrait({
       }
 
       const drawEraseTrails = () => {
-        if (!animate || scatterProgress <= 0 || !eraseRects.length) return;
+        if (
+          !animate ||
+          scatterProgress <= 0 ||
+          rawScrollProgress >= TRAJECTORY_LOCK_RAW_PROGRESS ||
+          !eraseRects.length
+        ) {
+          return;
+        }
 
         const trailWidth = Math.max(8.2, cellWidth * 0.94);
         const trailStep = 0.018;
@@ -172,15 +246,14 @@ export function AsciiPortrait({
             trailProgress <= scatterProgress;
             trailProgress += trailStep
           ) {
-            const trailArc = Math.sin(trailProgress * Math.PI);
-            const trailX =
-              baseX +
-              sample.scatterX * trailProgress +
-              sample.scatterCurveX * trailArc;
-            const trailY =
-              baseY +
-              sample.scatterY * trailProgress +
-              sample.scatterCurveY * trailArc;
+            const trailPosition = getSamplePosition(
+              sample,
+              trailProgress,
+              baseX,
+              baseY,
+            );
+            const trailX = trailPosition.x;
+            const trailY = trailPosition.y;
 
             crossesEraseTarget = eraseRects.some(
               (rect) =>
@@ -202,26 +275,22 @@ export function AsciiPortrait({
             trailProgress < scatterProgress;
             trailProgress += trailStep
           ) {
-            const trailArc = Math.sin(trailProgress * Math.PI);
-            context.lineTo(
-              baseX +
-                sample.scatterX * trailProgress +
-                sample.scatterCurveX * trailArc,
-              baseY +
-                sample.scatterY * trailProgress +
-                sample.scatterCurveY * trailArc,
+            const trailPosition = getSamplePosition(
+              sample,
+              trailProgress,
+              baseX,
+              baseY,
             );
+            context.lineTo(trailPosition.x, trailPosition.y);
           }
 
-          const currentX =
-            baseX +
-            sample.scatterX * scatterProgress +
-            sample.scatterCurveX * scatterArc;
-          const currentY =
-            baseY +
-            sample.scatterY * scatterProgress +
-            sample.scatterCurveY * scatterArc;
-          context.lineTo(currentX, currentY);
+          const currentPosition = getSamplePosition(
+            sample,
+            scatterProgress,
+            baseX,
+            baseY,
+          );
+          context.lineTo(currentPosition.x, currentPosition.y);
         }
 
         context.stroke();
@@ -231,16 +300,15 @@ export function AsciiPortrait({
       drawEraseTrails();
 
       for (const sample of samples) {
+        if (scatterProgress > TRAJECTORY_LOCK_PROGRESS && !sample.continuesAfterLock) {
+          continue;
+        }
+
         const baseX = (sample.column + 0.5) * cellWidth;
         const baseY = (sample.row + 0.5) * cellHeight;
-        let x =
-          baseX +
-          sample.scatterX * scatterProgress +
-          sample.scatterCurveX * scatterArc;
-        let y =
-          baseY +
-          sample.scatterY * scatterProgress +
-          sample.scatterCurveY * scatterArc;
+        const position = getSamplePosition(sample, scatterProgress, baseX, baseY);
+        let x = position.x;
+        let y = position.y;
         let colorInfluence = 0;
 
         if (animate) {
@@ -277,7 +345,7 @@ export function AsciiPortrait({
             )
           ];
 
-        context.globalAlpha = (0.3 + sample.darkness * 0.7) * (1 - scatterFade);
+        context.globalAlpha = 0.3 + sample.darkness * 0.7;
         context.fillStyle =
           colorPalette[Math.round(colorInfluence * (colorPalette.length - 1))];
         context.fillText(glyph, x, y);
@@ -292,7 +360,7 @@ export function AsciiPortrait({
         return;
       }
 
-      if (time - lastFrame >= 32) {
+      if (time - lastFrame >= frameInterval) {
         draw(time);
         lastFrame = time;
       }
@@ -386,8 +454,15 @@ export function AsciiPortrait({
 
           samples.push({
             column,
+            continuationDirectionX: 0,
+            continuationDirectionY: 0,
+            continuationDistance: 0,
+            continuationInitialRate: 0,
+            continuesAfterLock: false,
             darkness,
             glyphIndex: Math.max(1, Math.round(darkness * (GLYPHS.length - 1))),
+            lockOffsetX: 0,
+            lockOffsetY: 0,
             row,
             scatterCurveX: 0,
             scatterCurveY: 0,
@@ -476,6 +551,70 @@ export function AsciiPortrait({
             (targetY - baseY - sample.scatterY * crossingProgress) / crossingArc;
         });
       });
+
+      for (const sample of samples) {
+        const baseX = (sample.column + 0.5) * cellWidth;
+        const baseY = (sample.row + 0.5) * cellHeight;
+        const lockOffsetX =
+          sample.scatterX * TRAJECTORY_LOCK_PROGRESS +
+          sample.scatterCurveX * TRAJECTORY_LOCK_ARC;
+        const lockOffsetY =
+          sample.scatterY * TRAJECTORY_LOCK_PROGRESS +
+          sample.scatterCurveY * TRAJECTORY_LOCK_ARC;
+        const arcVelocity =
+          Math.PI * Math.cos(TRAJECTORY_LOCK_PROGRESS * Math.PI);
+        let tangentX = sample.scatterX + sample.scatterCurveX * arcVelocity;
+        let tangentY = sample.scatterY + sample.scatterCurveY * arcVelocity;
+        let tangentLength = Math.hypot(tangentX, tangentY);
+
+        if (tangentLength < 0.001) {
+          tangentX = sample.scatterX;
+          tangentY = sample.scatterY;
+          tangentLength = Math.max(0.001, Math.hypot(tangentX, tangentY));
+        }
+
+        const directionX = tangentX / tangentLength;
+        const directionY = tangentY / tangentLength;
+        const lockX = baseX + lockOffsetX;
+        const lockY = baseY + lockOffsetY;
+        const margin = Math.max(width, height) * (coarsePointer.matches ? 0.04 : 0.07);
+        const alreadyOutside =
+          lockX < -margin ||
+          lockX > width + margin ||
+          lockY < -margin ||
+          lockY > height + margin;
+        const exitDistances = [
+          directionX > 0.0001
+            ? (width + margin - lockX) / directionX
+            : Number.POSITIVE_INFINITY,
+          directionX < -0.0001
+            ? (-margin - lockX) / directionX
+            : Number.POSITIVE_INFINITY,
+          directionY > 0.0001
+            ? (height + margin - lockY) / directionY
+            : Number.POSITIVE_INFINITY,
+          directionY < -0.0001
+            ? (-margin - lockY) / directionY
+            : Number.POSITIVE_INFINITY,
+        ].filter((distance) => distance > 0 && Number.isFinite(distance));
+        const edgeDistance = !alreadyOutside && exitDistances.length
+          ? Math.min(...exitDistances)
+          : 0;
+        const speedSeed =
+          (Math.sin(sample.column * 37.71 + sample.row * 113.93) + 1) * 0.5;
+        const initialRate = tangentLength * TRAJECTORY_LOCK_REMAINDER;
+
+        sample.lockOffsetX = lockOffsetX;
+        sample.lockOffsetY = lockOffsetY;
+        sample.continuationDirectionX = directionX;
+        sample.continuationDirectionY = directionY;
+        sample.continuationInitialRate = initialRate;
+        sample.continuesAfterLock = directionY < -0.02;
+        sample.continuationDistance = Math.max(
+          initialRate,
+          edgeDistance * (1.05 + speedSeed * 0.12),
+        );
+      }
 
       draw(0);
       setIsReady(true);

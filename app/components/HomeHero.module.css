@@ -4,7 +4,7 @@
   --work-offset: 112%;
   --work-progress: 0;
   position: relative;
-  min-height: 270svh;
+  min-height: 520svh;
   background: #ffffff;
   color: #111111;
 }
@@ -132,7 +132,7 @@
   top: 48%;
   right: auto;
   bottom: auto;
-  left: calc(50% + var(--identity-offset) + clamp(106px, 10.55vw, 156px) + 18px);
+  left: calc(50% + var(--identity-offset) + clamp(106px, 10.55vw, 156px) + 32px);
   width: clamp(136px, 11vw, 160px);
   height: 48px;
   overflow: hidden;
@@ -156,7 +156,7 @@
 .metaRotor {
   position: relative;
   transform-style: preserve-3d;
-  animation: meta-turn 18s linear infinite;
+  animation: meta-turn 12s linear infinite;
   animation-play-state: paused;
   will-change: transform;
 }
@@ -208,7 +208,7 @@
 }
 
 .metaValueTrack {
-  animation-duration: 18s;
+  animation-duration: 12s;
   animation-iteration-count: infinite;
   animation-play-state: paused;
   will-change: transform;
@@ -328,7 +328,7 @@
 @media (max-width: 720px) {
   .hero {
     --identity-offset: clamp(68px, 18vw, 82px);
-    min-height: 220svh;
+    min-height: 400svh;
   }
 
   .heroStage {
@@ -364,7 +364,7 @@
 
   .metaObject {
     top: calc(31% + 44px);
-    right: 16px;
+    right: 10px;
     bottom: auto;
     left: auto;
     width: clamp(136px, 38vw, 158px);
@@ -383,6 +383,7 @@
   .workTitleWord {
     font-size: clamp(72px, 25vw, 112px);
   }
+
 }
 
 @media (max-height: 700px) and (min-width: 721px) {
