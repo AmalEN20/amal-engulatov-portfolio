@@ -1,10 +1,27 @@
 .hero {
   --identity-offset: clamp(150px, 15.8vw, 220px);
   --hero-progress: 0;
-  --work-offset: 112%;
   --work-progress: 0;
+  --work-heading-progress: 0;
+  --card-one-progress: 0;
+  --card-two-progress: 0;
+  --work-copy-one-progress: 0;
+  --work-copy-two-progress: 0;
+  --work-year-progress: 0;
+  --work-heading-exit: 0;
+  --card-one-exit: 0;
+  --card-two-exit: 0;
+  --about-progress: 0;
+  --about-row-one-progress: 0;
+  --about-row-two-progress: 0;
+  --about-row-three-progress: 0;
+  --about-wave-one-progress: 0;
+  --about-wave-two-progress: 0;
+  --about-wave-three-progress: 0;
+  --about-exit-progress: 0;
+  --contact-progress: 0;
   position: relative;
-  min-height: 520svh;
+  min-height: 2150svh;
   background: #ffffff;
   color: #111111;
 }
@@ -24,7 +41,9 @@
 }
 
 .heroScene,
-.workArrival {
+.workArrival,
+.aboutArrival,
+.contactArrival {
   position: absolute;
   inset: 0;
 }
@@ -96,34 +115,677 @@
 
 .workArrival {
   z-index: 4;
-  display: grid;
-  place-items: center;
+  display: flex;
+  padding: clamp(76px, 7vw, 104px) clamp(24px, 4.2vw, 68px) clamp(24px, 3vw, 44px);
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: center;
   background: #ffffff;
   opacity: var(--work-progress);
+  pointer-events: auto;
+}
+
+.workHeadingReveal {
+  position: relative;
+  width: min(100%, 28rem);
+  margin: 0 auto clamp(20px, 2.5vw, 32px);
+  overflow: hidden;
+  flex: 0 0 auto;
+  transform: translate3d(0, calc((1 - var(--work-heading-progress)) * 12px), 0);
+  will-change: transform;
+}
+
+.workHeading {
+  margin: 0;
+  background: linear-gradient(
+    110deg,
+    #111111 0%,
+    #111111 34%,
+    #a7a7a7 50%,
+    #111111 66%,
+    #111111 100%
+  );
+  background-position: -180% 50%;
+  background-size: 240% 100%;
+  color: transparent;
+  font-family: var(--font-geist), Arial, sans-serif;
+  font-size: clamp(1.38rem, 1.9vw, 2.05rem);
+  font-variation-settings: "wght" 350;
+  font-weight: 350;
+  letter-spacing: -.045em;
+  line-height: 1;
+  text-align: center;
+  animation: work-heading-gradient 4.2s linear infinite;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero[data-work-active="false"] .workHeading {
+  animation-play-state: paused;
+}
+
+.workHeadingCurtain {
+  position: absolute;
+  z-index: 1;
+  inset: -1px;
+  background: #ffffff;
+  pointer-events: none;
+  transform: translate3d(
+    0,
+    calc((var(--work-heading-progress) - var(--work-heading-exit)) * 101%),
+    0
+  );
+  will-change: transform;
+}
+
+.projectMeta,
+.projectCta {
+  font-family: var(--font-geist-mono), monospace;
+  text-transform: uppercase;
+}
+
+.workList {
+  display: grid;
+  gap: clamp(12px, 1.25vw, 18px);
+}
+
+.projectCard {
+  --card-progress: 0;
+  position: relative;
+  height: clamp(160px, 24vh, 184px);
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #ffffff;
+  background: #f4f4f1;
+  opacity: 1;
+  transform: translate3d(0, calc((1 - var(--card-progress)) * 18px), 0)
+    scale(calc(.99 + var(--card-progress) * .01));
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+.projectCard::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border: 1px solid #d8d8d8;
+  content: "";
   pointer-events: none;
 }
 
-.workTitle {
-  margin: 0;
-  color: #111111;
-  font-family: var(--font-geist), Arial, sans-serif;
+.projectLink {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(300px, 1fr);
+  height: 100%;
+  min-height: 0;
+  color: inherit;
+  text-decoration: none;
 }
 
-.workTitleMask {
-  display: block;
+.projectMedia {
+  position: relative;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
-  padding: .08em .08em .16em;
+  background: #171717;
+  isolation: isolate;
 }
 
-.workTitleWord {
+.projectMedia::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 58%, rgb(0 0 0 / .22));
+  content: "";
+  pointer-events: none;
+}
+
+.projectCard[data-project="evele-studio"] .projectMedia::before {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+  height: 0;
+  background: #0b0b0b;
+  content: "";
+  pointer-events: none;
+}
+
+.eveleArtwork {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  overflow: hidden;
+  place-items: center;
+  background: #09090a;
+}
+
+.eveleArtwork::before,
+.aiArtwork::before {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgb(255 255 255 / .025) 50%, transparent 100%);
+  content: "";
+}
+
+.projectWordmark {
+  position: relative;
+  z-index: 1;
   display: block;
-  font-size: clamp(88px, 15vw, 220px);
-  font-variation-settings: "wght" 250;
-  font-weight: 250;
+  background-position: 8% 50%;
+  background-size: 225% 100%;
+  color: transparent;
+  font-family: var(--font-geist), Arial, sans-serif;
+  font-size: clamp(2rem, 7.2vw, 6rem);
+  font-variation-settings: "wght" 560;
+  font-weight: 560;
   letter-spacing: -.07em;
-  line-height: .92;
-  transform: translate3d(0, var(--work-offset), 0);
+  line-height: .78;
+  animation: project-wordmark-gradient 6.8s ease-in-out infinite alternate;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.projectWordmark {
+  background-image: linear-gradient(
+    104deg,
+    #55565a 0%,
+    #f5f5f1 18%,
+    #77787c 36%,
+    #d9d9d6 51%,
+    #5e5f63 69%,
+    #ffffff 84%,
+    #66676b 100%
+  );
+  text-shadow: 0 0 26px rgb(247 247 243 / .055);
+}
+
+.aiWordmark {
+  font-variation-settings: "wght" 520;
+  font-weight: 520;
+}
+
+.aiArtwork {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  overflow: hidden;
+  place-items: center;
+  background: #09090a;
+}
+
+.hero[data-work-active="false"] .projectWordmark {
+  animation-play-state: paused;
+}
+
+.projectCurtain {
+  position: absolute;
+  z-index: 3;
+  inset: -1px;
+  display: block;
+  background: #ffffff;
+  pointer-events: none;
+  transform: translate3d(
+    0,
+    calc((var(--card-progress) - var(--card-exit-progress, 0)) * 101%),
+    0
+  );
   will-change: transform;
+}
+
+.projectCard:first-child {
+  --card-exit-progress: var(--card-one-exit);
+}
+
+.projectCard:last-child {
+  --card-exit-progress: var(--card-two-exit);
+}
+
+.projectRevealMask {
+  display: block;
+  overflow: clip;
+  overflow-clip-margin: 8px;
+}
+
+.projectBodyMask {
+  margin-block: auto;
+}
+
+.projectRevealBlock {
+  opacity: 1;
+  transform: none;
+}
+
+.aboutArrival {
+  z-index: 5;
+  display: flex;
+  min-height: 100svh;
+  padding-top: clamp(72px, 7vw, 96px);
+  overflow: hidden;
+  align-items: stretch;
+  background: transparent;
+  clip-path: inset(calc((1 - var(--about-progress)) * 100%) 0 0 0);
+  pointer-events: auto;
+  will-change: clip-path;
+}
+
+.aboutBands {
+  display: grid;
+  position: relative;
+  z-index: 1;
+  width: min(64vw, 820px);
+  min-height: 0;
+  margin: auto auto auto 0;
+  padding: clamp(30px, 4vw, 56px) clamp(18px, 2vw, 30px)
+    clamp(30px, 4vw, 56px) clamp(24px, 4.2vw, 68px);
+  align-content: center;
+  gap: clamp(38px, 5.2vh, 56px);
+  grid-template-rows: repeat(3, auto);
+  opacity: clamp(0, calc((.78 - var(--about-exit-progress)) * 5.555556), 1);
+  will-change: opacity;
+}
+
+.aboutBand {
+  --about-row-progress: 0;
+  --about-wave-progress: 0;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.aboutBandInner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-items: start;
+  justify-content: center;
+  column-gap: clamp(24px, 3vw, 42px);
+  grid-template-columns: minmax(78px, 110px) minmax(0, 680px);
+  grid-template-rows: auto auto;
+  row-gap: 7px;
+}
+
+.aboutBandCurtain {
+  position: absolute;
+  z-index: 2;
+  inset: -1px;
+  display: block;
+  background: #ffffff;
+  pointer-events: none;
+  transform: translate3d(calc(var(--about-row-progress) * 101%), 0, 0);
+  will-change: transform;
+}
+
+.aboutLabel {
+  grid-row: 1 / span 2;
+  padding-top: .5em;
+  color: #555555;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: clamp(9px, .72vw, 11px);
+  font-weight: 550;
+  letter-spacing: .14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.contactArrival {
+  z-index: 4;
+  display: grid;
+  overflow: hidden;
+  padding: clamp(88px, 9vw, 132px) clamp(24px, 4.2vw, 68px);
+  place-items: center;
+  background: #ffffff;
+  clip-path: inset(calc((1 - var(--contact-progress)) * 100%) 0 0 0);
+  pointer-events: auto;
+  will-change: clip-path;
+}
+
+.contactInner {
+  display: grid;
+  width: min(100%, 940px);
+  justify-items: center;
+  gap: clamp(13px, 1.7vw, 22px);
+  text-align: center;
+  transform: translate3d(0, calc((1 - var(--contact-progress)) * 28px), 0);
+  opacity: var(--contact-progress);
+  will-change: opacity, transform;
+}
+
+.contactTitleMask {
+  padding: .08em .04em .12em;
+}
+
+.contactTitleMask h2 {
+  width: min(100%, 28rem);
+  margin: 0;
+  font-family: var(--font-geist), Arial, sans-serif;
+  font-size: clamp(1.38rem, 1.9vw, 2.05rem);
+  font-variation-settings: "wght" 350;
+  font-weight: 350;
+  letter-spacing: -.045em;
+  line-height: 1;
+}
+
+.contactTitleWords {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 .18em;
+}
+
+.contactTitleWordMask,
+.contactLinkMask {
+  display: inline-block;
+  overflow: clip;
+}
+
+.contactTitleWordMask {
+  padding: .08em .025em .12em;
+}
+
+.contactTitleWord {
+  --contact-word-index: 0;
+  --contact-word-progress: clamp(
+    0,
+    calc(var(--contact-title-progress) * 1.45 - var(--contact-word-index) * .15),
+    1
+  );
+  display: block;
+  transform: translate3d(
+    0,
+    calc((1 - var(--contact-word-progress)) * 112%),
+    0
+  );
+  will-change: transform;
+}
+
+.contactConnector {
+  display: block;
+  width: 1px;
+  height: clamp(48px, 6vh, 68px);
+  background: linear-gradient(180deg, #d7d7d7 0%, #777777 54%, #d0d0d0 100%);
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition:
+    opacity 220ms ease 900ms,
+    transform 900ms cubic-bezier(.16, 1, .3, 1) 380ms;
+  will-change: opacity, transform;
+}
+
+.contactLinkMask {
+  padding: 8px;
+}
+
+.contactLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 2px;
+  background: linear-gradient(
+    110deg,
+    #111111 0%,
+    #111111 34%,
+    #a7a7a7 50%,
+    #111111 66%,
+    #111111 100%
+  );
+  background-position: -180% 50%;
+  background-size: 240% 100%;
+  color: transparent;
+  font-family: var(--font-geist), Arial, sans-serif;
+  font-size: clamp(1rem, 1.3vw, 1.35rem);
+  font-variation-settings: "wght" 350;
+  font-weight: 350;
+  letter-spacing: -.045em;
+  line-height: 1;
+  text-decoration: none;
+  animation: work-heading-gradient 4.2s linear infinite;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0;
+  transform: translate3d(0, 112%, 0);
+  transition:
+    opacity 360ms ease,
+    transform 680ms cubic-bezier(.16, 1, .3, 1);
+  will-change: opacity, transform;
+}
+
+.hero[data-contact-sequence="hidden"] .contactLink {
+  animation-play-state: paused;
+}
+
+.hero[data-contact-sequence="visible"] .contactConnector {
+  opacity: 1;
+  transform: scaleY(1);
+  transition:
+    opacity 200ms ease 40ms,
+    transform 900ms cubic-bezier(.16, 1, .3, 1) 40ms;
+}
+
+.hero[data-contact-sequence="visible"] .contactLink {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 480ms ease 640ms,
+    transform 680ms cubic-bezier(.16, 1, .3, 1) 640ms;
+}
+
+.contactLink:hover {
+  transform: translateY(-2px);
+}
+
+.contactLink:focus-visible {
+  outline: 1px solid #111111;
+  outline-offset: 7px;
+}
+
+.aboutBand h3 {
+  max-width: 31ch;
+  margin: 0;
+  font-family: var(--font-geist), Arial, sans-serif;
+  font-size: clamp(22px, 2vw, 29px);
+  font-variation-settings: "wght" 330;
+  font-weight: 330;
+  letter-spacing: -.045em;
+  line-height: 1;
+}
+
+.aboutBand p {
+  max-width: 58ch;
+  margin: 0;
+  color: #555555;
+  font-family: var(--font-geist), Arial, sans-serif;
+  font-size: clamp(11px, .86vw, 13px);
+  font-weight: 400;
+  letter-spacing: -.015em;
+  line-height: 1.46;
+}
+
+.aboutCopyRow {
+  display: block;
+  min-width: 0;
+  padding-right: clamp(34px, 4vw, 54px);
+}
+
+.aboutCopyRow p {
+  width: 100%;
+}
+
+.aboutEmitterSlot {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: block;
+  width: clamp(24px, 3vw, 42px);
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+.aboutEmitterLine {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  display: block;
+  background: linear-gradient(90deg, #c8c8c8 0%, #777777 44%, #1d1d1d 100%);
+  background-position: calc((1 - var(--about-wave-progress)) * 100%) 50%;
+  background-size: 180% 100%;
+  opacity: clamp(
+    0,
+    calc(var(--about-wave-progress) * 8),
+    1
+  );
+  clip-path: inset(
+    0 0 0 clamp(
+      0%,
+      calc((var(--about-wave-progress) - .28) * 714.285714%),
+      100%
+    )
+  );
+  transform: translateY(-50%) scaleX(
+    clamp(
+      0,
+      calc(var(--about-wave-progress) * 8),
+      1
+    )
+  );
+  transform-origin: left center;
+  will-change: clip-path, opacity, transform;
+}
+
+.projectCopy {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: clamp(14px, 1.6vw, 22px);
+  flex-direction: column;
+  background: #f4f4f1;
+  isolation: isolate;
+}
+
+.projectCopy::after {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  background: #f4f4f1;
+  content: "";
+  pointer-events: none;
+  transform: translate3d(calc(var(--copy-progress, 1) * 101%), 0, 0);
+  will-change: transform;
+}
+
+.projectMeta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  color: #747474;
+  font-size: clamp(7px, .62vw, 9px);
+  font-weight: 500;
+  letter-spacing: .1em;
+  line-height: 1.45;
+}
+
+.projectMeta span:first-child {
+  max-width: 30ch;
+}
+
+.projectYear {
+  display: inline-block;
+  opacity: clamp(0, var(--work-year-progress), 1);
+  transform: translate3d(
+    0,
+    calc((1 - var(--work-year-progress)) * 112%),
+    0
+  );
+  will-change: opacity, transform;
+}
+
+.projectBody {
+  display: grid;
+  gap: clamp(7px, .8vw, 12px);
+  margin: 0;
+  padding-block: clamp(11px, 1.7vw, 24px);
+}
+
+.projectBody h3 {
+  margin: 0;
+  font-family: var(--font-geist), Arial, sans-serif;
+  font-size: clamp(27px, 2.8vw, 42px);
+  font-variation-settings: "wght" 280;
+  font-weight: 280;
+  letter-spacing: -.06em;
+  line-height: .94;
+}
+
+.projectBody p {
+  max-width: 43ch;
+  margin: 0;
+  color: #4e4e4e;
+  font-family: var(--font-geist), Arial, sans-serif;
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: clamp(10px, .82vw, 13px);
+  letter-spacing: -.018em;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.projectCta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid #cfcfcb;
+  font-size: clamp(8px, .7vw, 10px);
+  font-weight: 500;
+  letter-spacing: .12em;
+  line-height: 1.2;
+}
+
+.projectCta span {
+  font-family: var(--font-geist), Arial, sans-serif;
+  font-size: 17px;
+  transform: translate3d(0, 0, 0);
+  transition: transform 420ms cubic-bezier(.16, 1, .3, 1);
+}
+
+.projectLink:hover .projectCta span,
+.projectLink:focus-visible .projectCta span {
+  transform: translate3d(4px, -4px, 0);
+}
+
+.projectLink:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: -4px;
+}
+
+@keyframes project-wordmark-gradient {
+  from {
+    background-position: 8% 50%;
+  }
+  to {
+    background-position: 92% 50%;
+  }
+}
+
+@keyframes work-heading-gradient {
+  from {
+    background-position: -180% 50%;
+  }
+  to {
+    background-position: 180% 50%;
+  }
 }
 
 .metaObject {
@@ -327,14 +989,13 @@
 }
 
 :global(html[data-route-transition="covering"]) .heroStage {
-  opacity: .72;
   transform: scale(.99);
 }
 
 @media (max-width: 720px) {
   .hero {
     --identity-offset: clamp(68px, 18vw, 82px);
-    min-height: 400svh;
+    min-height: 1680svh;
   }
 
   .heroStage {
@@ -386,8 +1047,141 @@
     font-size: clamp(9px, 2.45vw, 11px);
   }
 
-  .workTitleWord {
-    font-size: clamp(72px, 25vw, 112px);
+  .workArrival {
+    padding: 76px 16px 20px;
+  }
+
+  .workHeadingReveal {
+    width: min(100%, 28rem);
+    margin-bottom: 18px;
+  }
+
+  .workList {
+    gap: 10px;
+  }
+
+  .projectCard {
+    height: clamp(160px, 21svh, 172px);
+    min-height: 0;
+    transform: translate3d(0, calc((1 - var(--card-progress)) * 12px), 0)
+      scale(calc(.992 + var(--card-progress) * .008));
+  }
+
+  .projectLink {
+    grid-template-columns: minmax(118px, .84fr) minmax(0, 1.16fr);
+  }
+
+  .projectMedia {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .projectCard[data-project="evele-studio"] .projectMedia::before {
+    display: none;
+    height: 0;
+  }
+
+  .aboutArrival {
+    padding: 72px 16px 24px;
+  }
+
+  .aboutBands {
+    width: 52%;
+    margin: auto auto auto 0;
+    padding: 24px 0;
+    gap: clamp(28px, 5vh, 38px);
+  }
+
+  .aboutBandInner {
+    justify-content: stretch;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    row-gap: 6px;
+  }
+
+  .aboutCopyRow {
+    padding-right: clamp(27px, 8vw, 35px);
+  }
+
+  .aboutEmitterSlot {
+    width: clamp(18px, 6vw, 26px);
+    height: 2px;
+  }
+
+  .aboutLabel {
+    grid-row: auto;
+    padding-top: 0;
+    font-size: 8px;
+  }
+
+  .aboutBand h3 {
+    max-width: 28ch;
+    font-size: clamp(20px, 5.7vw, 25px);
+    line-height: 1;
+  }
+
+  .aboutBand p {
+    max-width: 48ch;
+    font-size: clamp(9px, 2.45vw, 11px);
+    line-height: 1.44;
+  }
+
+  .contactArrival {
+    padding: 76px 16px 28px;
+  }
+
+  .contactInner {
+    gap: 14px;
+  }
+
+  .contactTitleMask h2 {
+    max-width: 100%;
+    font-size: clamp(1.25rem, 5.8vw, 1.6rem);
+  }
+
+  .contactLink {
+    font-size: clamp(.95rem, 4.2vw, 1.15rem);
+  }
+
+  .projectCopy {
+    min-height: 0;
+    padding: 10px;
+  }
+
+  .projectMeta {
+    gap: 8px;
+    font-size: 6px;
+    letter-spacing: .06em;
+  }
+
+  .projectMeta span:first-child {
+    max-width: 18ch;
+  }
+
+  .projectBody {
+    gap: 5px;
+    padding-block: 8px;
+  }
+
+  .projectBody h3 {
+    font-size: clamp(21px, 6.4vw, 27px);
+    line-height: .96;
+  }
+
+  .projectBody p {
+    font-size: clamp(8px, 2.35vw, 10px);
+    line-height: 1.35;
+    -webkit-line-clamp: 3;
+  }
+
+  .projectCta {
+    padding-top: 6px;
+    font-size: 6px;
+    letter-spacing: .08em;
+  }
+
+  .projectCta span {
+    font-size: 11px;
   }
 
 }
@@ -427,7 +1221,9 @@
   }
 
   .heroScene,
-  .workArrival {
+  .workArrival,
+  .aboutArrival,
+  .contactArrival {
     position: relative;
     min-height: 100svh;
   }
@@ -459,9 +1255,88 @@
   }
 
   .workArrival,
-  .workTitleWord {
+  .workHeadingReveal,
+  .projectCard {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .projectCurtain {
+    display: none;
+  }
+
+  .projectCopy::after {
+    display: none;
+  }
+
+  .projectRevealBlock {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .projectWordmark {
+    animation: none !important;
+    background-position: 50% 50% !important;
+  }
+
+  .projectYear {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .workHeadingCurtain {
+    display: none;
+  }
+
+  .workHeading {
+    animation: none !important;
+    background-position: 50% 50% !important;
+  }
+
+  .aboutArrival {
+    clip-path: none !important;
+  }
+
+  .aboutBands,
+  .contactInner {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .contactArrival {
+    clip-path: none !important;
+  }
+
+  .contactTitleWord {
+    transform: none !important;
+  }
+
+  .contactConnector {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .contactLink {
+    animation: none !important;
+    background-position: 50% 50% !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .aboutBandInner {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .aboutBandCurtain {
+    display: none;
+  }
+
+  .aboutEmitterLine {
+    display: none;
   }
 
   .metaObject {

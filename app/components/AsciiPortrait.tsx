@@ -22,6 +22,28 @@ const TRAJECTORY_LOCK_ARC = Math.sin(TRAJECTORY_LOCK_PROGRESS * Math.PI);
 const TRAJECTORY_LOCK_REMAINDER = 1 - TRAJECTORY_LOCK_PROGRESS;
 const subscribeToClient = () => () => {};
 
+export type AboutFigureProgress = {
+  clipBottom: number;
+  clipTop: number;
+  exit: number;
+  surface: number;
+  waveOne: number;
+  waveTwo: number;
+  waveThree: number;
+};
+
+type AboutParticle = {
+  darkness: number;
+  glyphIndex: number;
+  phase: 0 | 1 | 2;
+  seedA: number;
+  seedB: number;
+  seedC: number;
+  seedD: number;
+  targetX: number;
+  targetY: number;
+};
+
 type Sample = {
   column: number;
   continuationDirectionX: number;
@@ -83,11 +105,13 @@ type EraseRect = {
 };
 
 type AsciiPortraitProps = {
+  aboutProgressRef?: RefObject<AboutFigureProgress>;
   className?: string;
   scrollProgressRef?: RefObject<number>;
 };
 
 export function AsciiPortrait({
+  aboutProgressRef,
   className = "",
   scrollProgressRef,
 }: AsciiPortraitProps) {
@@ -122,6 +146,11 @@ export function AsciiPortrait({
     let cellHeight = 0;
     let width = 0;
     let height = 0;
+    let aboutGlyphSize = 7;
+    let aboutEraseRects: EraseRect[] = [];
+    let aboutParticles: AboutParticle[] = [];
+    let aboutSources: EraseRect[] = [];
+    let aboutWasActive = false;
     const colorPalette = Array.from({ length: 9 }, (_, index) => {
       const mix = index / 8;
       const channel = Math.round(17 + (112 - 17) * mix);
@@ -155,6 +184,384 @@ export function AsciiPortrait({
         }));
     };
 
+    const sampleAboutFigure = () => {
+      aboutEraseRects = [
+        ...document.querySelectorAll<HTMLElement>("[data-about-particle-erase]"),
+      ].map((target) => {
+        const rect = target.getBoundingClientRect();
+
+        return {
+          height: rect.height,
+          width: rect.width,
+          x: rect.left,
+          y: rect.top,
+        };
+      });
+      aboutSources = [
+        ...document.querySelectorAll<HTMLElement>("[data-about-particle-source]"),
+      ].map((sourceElement) => {
+        const rect = sourceElement.getBoundingClientRect();
+
+        return {
+          height: rect.height,
+          width: rect.width,
+          x: rect.left,
+          y: rect.top,
+        };
+      });
+
+      aboutParticles = [];
+      if (!samples.length) return;
+
+      const minColumn = Math.min(...samples.map((sample) => sample.column));
+      const maxColumn = Math.max(...samples.map((sample) => sample.column));
+      const minRow = Math.min(...samples.map((sample) => sample.row));
+      const maxRow = Math.max(...samples.map((sample) => sample.row));
+      const sampleWidth = Math.max(1, (maxColumn - minColumn + 1) * cellWidth);
+      const sampleHeight = Math.max(1, (maxRow - minRow + 1) * cellHeight);
+      const isNarrow = width <= 720;
+      const figureHeight = Math.min(
+        height * (isNarrow ? 0.62 : 0.92),
+        isNarrow ? 560 : 820,
+      );
+      const figureWidth = figureHeight * (sampleWidth / sampleHeight);
+      const figureCenterX = isNarrow
+        ? width * 0.82
+        : width - figureWidth * 0.82;
+      const figureBottom = height + (isNarrow ? 10 : 14);
+      const figureTop = figureBottom - figureHeight;
+      const targetCellWidth = figureWidth / Math.max(1, maxColumn - minColumn + 1);
+
+      aboutGlyphSize = Math.max(isNarrow ? 5.8 : 7, targetCellWidth * 1.08);
+
+      samples.forEach((sample) => {
+        const seedA =
+          (Math.sin(sample.column * 91.17 + sample.row * 47.31) + 1) * 0.5;
+        const seedB =
+          (Math.sin(sample.column * 37.71 + sample.row * 113.93) + 1) * 0.5;
+        const phaseSeed =
+          (Math.sin(sample.column * 173.17 + sample.row * 61.73) + 1) * 0.5;
+        const seedC =
+          (Math.sin(sample.column * 211.13 + sample.row * 29.47) + 1) * 0.5;
+        const seedD =
+          (Math.sin(sample.column * 53.81 + sample.row * 197.33) + 1) * 0.5;
+
+        if (isNarrow && seedA < 0.18) return;
+
+        const phase = Math.min(2, Math.floor(phaseSeed * 3)) as 0 | 1 | 2;
+        const normalizedX =
+          (sample.column - minColumn + 0.5) / Math.max(1, maxColumn - minColumn + 1);
+        const normalizedY =
+          (sample.row - minRow + 0.5) / Math.max(1, maxRow - minRow + 1);
+
+        aboutParticles.push({
+          darkness: sample.darkness,
+          glyphIndex: sample.glyphIndex,
+          phase,
+          seedA,
+          seedB,
+          seedC,
+          seedD,
+          targetX:
+            figureCenterX +
+            (normalizedX - 0.5) * figureWidth,
+          targetY:
+            figureTop +
+            normalizedY * figureHeight,
+        });
+      });
+
+      aboutParticles.sort(
+        (first, second) =>
+          first.phase - second.phase || first.seedC - second.seedC,
+      );
+    };
+
+    const drawAboutFigure = (aboutProgress: AboutFigureProgress, phase: number) => {
+      if (!aboutParticles.length) return;
+
+      const waveProgress = [
+        aboutProgress.waveOne,
+        aboutProgress.waveTwo,
+        aboutProgress.waveThree,
+      ];
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.font = `600 ${aboutGlyphSize}px var(--font-geist-mono), monospace`;
+      context.save();
+      context.beginPath();
+      context.rect(
+        0,
+        aboutProgress.clipTop,
+        width,
+        Math.max(0, aboutProgress.clipBottom - aboutProgress.clipTop),
+      );
+      context.clip();
+
+      const getExitState = (particle: AboutParticle) => {
+        const normalizedExit = Math.min(1, aboutProgress.exit / 0.76);
+        const exitStagger = particle.seedC * 0.12;
+        const exitLinear = Math.min(
+          1,
+          Math.max(
+            0,
+            (normalizedExit - exitStagger) / Math.max(0.001, 1 - exitStagger),
+          ),
+        );
+        let exitProgress = exitLinear * exitLinear * (3 - 2 * exitLinear);
+        const verticalBand = Math.min(2, Math.floor(particle.seedA * 3));
+        const verticalDirection = [-0.64, 0, 0.64][verticalBand];
+        const destinationX = -width * (0.08 + particle.seedD * 0.28);
+        let destinationY =
+          particle.targetY +
+          verticalDirection * height +
+          (particle.seedB - 0.5) * height * 0.24;
+
+        if (particle.seedB < 0.2 && aboutEraseRects.length) {
+          const routedLinear = Math.min(1, exitLinear * 1.45);
+          exitProgress = routedLinear * routedLinear * (3 - 2 * routedLinear);
+          const eraseRect = aboutEraseRects[
+            Math.min(
+              aboutEraseRects.length - 1,
+              Math.floor(particle.seedD * aboutEraseRects.length),
+            )
+          ];
+          const crossingX = eraseRect.x + eraseRect.width * (0.2 + particle.seedA * 0.6);
+          const crossingY = eraseRect.y + eraseRect.height * (0.16 + particle.seedC * 0.68);
+          const crossingProgress = Math.min(
+            0.96,
+            Math.max(
+              0.12,
+              (crossingX - particle.targetX) / (destinationX - particle.targetX),
+            ),
+          );
+
+          destinationY =
+            particle.targetY +
+            (crossingY - particle.targetY) / crossingProgress;
+        }
+
+        return {
+          progress: exitProgress,
+          x: particle.targetX + (destinationX - particle.targetX) * exitProgress,
+          y: particle.targetY + (destinationY - particle.targetY) * exitProgress,
+        };
+      };
+
+      if (aboutProgress.exit > 0 && aboutEraseRects.length) {
+        context.save();
+        context.beginPath();
+        aboutEraseRects.forEach((rect) => {
+          context.rect(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);
+        });
+        context.clip();
+        context.beginPath();
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.lineWidth = Math.max(7.5, aboutGlyphSize * 1.04);
+        context.strokeStyle = "#ffffff";
+        context.globalAlpha = 1;
+
+        aboutParticles.forEach((particle) => {
+          const exitState = getExitState(particle);
+          if (exitState.progress <= 0) return;
+
+          context.moveTo(particle.targetX, particle.targetY);
+          context.lineTo(exitState.x, exitState.y);
+        });
+
+        context.stroke();
+
+        const cleanupLinear = Math.min(
+          1,
+          Math.max(0, (aboutProgress.exit - 0.62) / 0.1),
+        );
+        const cleanupProgress =
+          cleanupLinear * cleanupLinear * (3 - 2 * cleanupLinear);
+
+        if (cleanupProgress > 0) {
+          context.globalAlpha = cleanupProgress;
+          context.fillStyle = "#ffffff";
+          aboutEraseRects.forEach((rect) => {
+            context.fillRect(rect.x - 2, rect.y - 2, rect.width + 4, rect.height + 4);
+          });
+        }
+
+        context.restore();
+      }
+
+      let activeAboutFontSize = -1;
+
+      aboutParticles.forEach((particle) => {
+        const wave = waveProgress[particle.phase];
+        const stagger = particle.seedC * 0.26;
+        const linear = Math.min(
+          1,
+          Math.max(0, (wave - stagger) / Math.max(0.001, 1 - stagger)),
+        );
+
+        if (linear <= 0) return;
+
+        const progress = linear * linear * (3 - 2 * linear);
+        const scatterEnvelope = Math.sin(progress * Math.PI);
+        const crossEnvelope = Math.sin(progress * Math.PI * 2) * (1 - progress);
+        const source = aboutSources[particle.phase];
+        const sourceX = source
+          ? source.x + source.width
+          : width * 0.62;
+        const sourceY = source
+          ? source.y + source.height * 0.5 + (particle.seedB - 0.5) * 2.4
+          : height * (0.3 + particle.phase * 0.2);
+        const scatterAngle = (particle.seedD - 0.5) * Math.PI * 0.95;
+        const scatterDistance =
+          Math.min(width, height) * (0.075 + particle.seedA * 0.18);
+        const crossDistance =
+          Math.min(width, height) * (particle.seedB - 0.5) * 0.12;
+        const scatterX =
+          Math.cos(scatterAngle) * scatterDistance * scatterEnvelope +
+          Math.cos(scatterAngle * 2.37) * crossDistance * crossEnvelope;
+        const scatterY =
+          Math.sin(scatterAngle) * scatterDistance * scatterEnvelope +
+          Math.sin(scatterAngle * 1.91) * crossDistance * crossEnvelope;
+        const fanLinear = Math.min(1, Math.max(0, (progress - 0.035) / 0.245));
+        const fanProgress = fanLinear * fanLinear * (3 - 2 * fanLinear);
+        const horizontalFan = 0.06 + fanProgress * 0.94;
+        let x =
+          sourceX +
+          (particle.targetX - sourceX) * progress * horizontalFan +
+          scatterX * horizontalFan;
+        let y =
+          sourceY +
+          (particle.targetY - sourceY) * progress * fanProgress +
+          scatterY * fanProgress;
+        let colorInfluence = 0;
+        const exitState = getExitState(particle);
+        const settledLinear = Math.min(1, Math.max(0, (linear - 0.96) / 0.04));
+        const settled = settledLinear * settledLinear * (3 - 2 * settledLinear);
+        const idleStrength = settled * (1 - exitState.progress);
+
+        if (idleStrength > 0) {
+          x +=
+            Math.sin(particle.targetY * 0.021 + phase * 1.15) *
+            (0.45 + particle.darkness * 1.25) *
+            idleStrength;
+          y +=
+            Math.cos(particle.targetX * 0.016 + phase * 0.82) *
+            particle.darkness *
+            0.55 *
+            idleStrength;
+        }
+
+        if (exitState.progress > 0) {
+          x += exitState.x - particle.targetX;
+          y += exitState.y - particle.targetY;
+        }
+
+        if (pointer.strength > 0 && exitState.progress < 0.84) {
+          const deltaX = particle.targetX - pointer.x;
+          const deltaY = particle.targetY - pointer.y;
+          const distance = Math.hypot(deltaX, deltaY);
+
+          if (distance > 0 && distance < width * 0.24) {
+            const force =
+              (1 - distance / (width * 0.24)) ** 2 *
+              pointer.strength *
+              Math.min(1, linear * 1.25) *
+              (1 - exitState.progress);
+            x += (deltaX / distance) * force * 9;
+            y += (deltaY / distance) * force * 9;
+            colorInfluence = force;
+          }
+        }
+        const flicker = Math.round(
+          ((Math.sin(phase * 1.7 + particle.seedA * 7 + particle.seedB * 11) + 1) *
+            0.35) *
+            idleStrength,
+        );
+        const textureOffset = Math.round(particle.seedA * 2) - flicker;
+        const glyph =
+          GLYPHS[
+            Math.max(
+              1,
+              Math.min(GLYPHS.length - 1, particle.glyphIndex - textureOffset),
+            )
+          ];
+
+        const departureDistance = Math.hypot(x - sourceX, y - sourceY);
+        const sizeLinear = Math.min(
+          1,
+          Math.max(0, (departureDistance - 3) / 30),
+        );
+        const sizeProgress = sizeLinear * sizeLinear * (3 - 2 * sizeLinear);
+        const launchScale = 0.045 + sizeProgress * 0.955;
+        const particleFontSize = Math.max(
+          0.6,
+          Math.round(aboutGlyphSize * launchScale * 4) / 4,
+        );
+
+        if (particleFontSize !== activeAboutFontSize) {
+          context.font = `600 ${particleFontSize}px var(--font-geist-mono), monospace`;
+          activeAboutFontSize = particleFontSize;
+        }
+
+        const departureLinear = Math.min(
+          1,
+          Math.max(0, (departureDistance - 3) / 14),
+        );
+        const departureVisibility =
+          departureLinear * departureLinear * (3 - 2 * departureLinear);
+
+        context.globalAlpha =
+          Math.min(1, linear * 7) *
+          (0.38 + particle.darkness * 0.62) *
+          departureVisibility;
+        context.fillStyle = colorPalette[
+          Math.min(
+            colorPalette.length - 1,
+            Math.round((1 - particle.darkness) * 3 + colorInfluence * 4),
+          )
+        ];
+        context.fillText(glyph, x, y);
+      });
+
+      if (aboutProgress.exit <= 0.001) {
+        waveProgress.forEach((wave, index) => {
+          const source = aboutSources[index];
+          if (!source || wave <= 0.125 || wave >= 0.255) return;
+
+          const pointInLinear = Math.min(
+            1,
+            Math.max(0, (wave - 0.125) / 0.035),
+          );
+          const pointIn = pointInLinear * pointInLinear * (3 - 2 * pointInLinear);
+          const pointOutLinear = Math.min(
+            1,
+            Math.max(0, (wave - 0.205) / 0.05),
+          );
+          const pointOut =
+            pointOutLinear * pointOutLinear * (3 - 2 * pointOutLinear);
+          const pointOpacity = pointIn * (1 - pointOut);
+
+          if (pointOpacity <= 0) return;
+
+          context.beginPath();
+          context.arc(
+            source.x + source.width,
+            source.y + source.height * 0.5,
+            width <= 720 ? 1.35 : 1.65,
+            0,
+            Math.PI * 2,
+          );
+          context.fillStyle = "#242424";
+          context.globalAlpha = pointOpacity;
+          context.fill();
+        });
+      }
+
+      context.restore();
+      context.globalAlpha = 1;
+    };
+
     const draw = (time = 0) => {
       if (!width || !height || !samples.length) return;
 
@@ -171,6 +578,51 @@ export function AsciiPortrait({
       const rawScrollProgress = reducedMotion.matches
         ? 0
         : Math.min(1, Math.max(0, scrollProgressRef?.current ?? 0));
+      const aboutProgress = aboutProgressRef?.current ?? {
+        clipBottom: 0,
+        clipTop: 0,
+        exit: 0,
+        surface: 0,
+        waveOne: 0,
+        waveTwo: 0,
+        waveThree: 0,
+      };
+      const aboutIsActive = animate && aboutProgress.surface > 0.001;
+
+      if (animate) {
+        const response = pointerTarget > pointer.strength ? 0.075 : 0.032;
+        pointer.strength += (pointerTarget - pointer.strength) * response;
+
+        if (!pointer.active && pointer.strength < 0.001) pointer.strength = 0;
+      } else {
+        pointer.strength = 0;
+      }
+
+      if (aboutIsActive) {
+        if (!aboutWasActive) {
+          // Route destinations mount below the opaque SiteShell surface. Refresh the
+          // DOM geometry only when About actually becomes visible so font/layout
+          // settling cannot leave the emitter points and erase clips at mount-time
+          // coordinates. Particle seeds and flight math remain deterministic.
+          sampleAboutFigure();
+        }
+        aboutWasActive = true;
+
+        if (aboutProgress.exit >= 0.78) {
+          canvas.style.zIndex = "2";
+          canvas.dataset.scene = "idle";
+          return;
+        }
+
+        const aboutIsExiting = aboutProgress.exit > 0.001;
+        canvas.style.zIndex = aboutIsExiting ? "99" : "6";
+        canvas.dataset.scene = aboutIsExiting ? "about-exit" : "about";
+        drawAboutFigure(aboutProgress, phase);
+        return;
+      }
+
+      aboutWasActive = false;
+
       const scatterLinear = Math.min(
         1,
         Math.max(
@@ -182,9 +634,12 @@ export function AsciiPortrait({
       const scatterProgress = scatterLinear * scatterLinear * (3 - 2 * scatterLinear);
       if (rawScrollProgress >= SCATTER_RAW_END) {
         canvas.style.zIndex = "2";
+        canvas.dataset.scene = "idle";
         context.globalAlpha = 1;
         return;
       }
+
+      canvas.dataset.scene = "hero";
 
       if (rawScrollProgress >= SCATTER_RAW_START - 0.005 && rawScrollProgress < SCATTER_RAW_END) {
         updateEraseRects();
@@ -194,15 +649,6 @@ export function AsciiPortrait({
         rawScrollProgress >= SCATTER_RAW_START && rawScrollProgress < SCATTER_RAW_END
           ? "160"
           : "2";
-
-      if (animate) {
-        const response = pointerTarget > pointer.strength ? 0.075 : 0.032;
-        pointer.strength += (pointerTarget - pointer.strength) * response;
-
-        if (!pointer.active && pointer.strength < 0.001) pointer.strength = 0;
-      } else {
-        pointer.strength = 0;
-      }
 
       const drawEraseTrails = () => {
         if (
@@ -394,7 +840,6 @@ export function AsciiPortrait({
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-
       columns = Math.max(42, Math.min(coarsePointer.matches ? 54 : 96, Math.round(width / 9)));
       cellWidth = width / columns;
       cellHeight = cellWidth * 1.18;
@@ -471,6 +916,8 @@ export function AsciiPortrait({
           });
         }
       }
+
+      sampleAboutFigure();
 
       for (const sample of samples) {
         const angleSeed =
@@ -651,6 +1098,13 @@ export function AsciiPortrait({
     const resizeObserver = new ResizeObserver(samplePortrait);
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       isVisible = entry.isIntersecting;
+
+      if (!isVisible) {
+        context.clearRect(0, 0, width, height);
+        canvas.style.zIndex = "2";
+        canvas.dataset.scene = "idle";
+      }
+
       startAnimation();
     });
 
@@ -673,7 +1127,7 @@ export function AsciiPortrait({
       window.removeEventListener("blur", handlePointerLeave);
       reducedMotion.removeEventListener("change", handleMotionChange);
     };
-  }, [portalTarget, scrollProgressRef]);
+  }, [aboutProgressRef, portalTarget, scrollProgressRef]);
 
   return (
     <>

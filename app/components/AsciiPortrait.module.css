@@ -29,6 +29,18 @@
   opacity: 1;
 }
 
+:global(body:has(canvas[data-scene="about"]) .site-nav),
+:global(body:has(canvas[data-scene="about-exit"]) .site-nav) {
+  transition:
+    background 260ms ease,
+    backdrop-filter 260ms ease;
+}
+
+:global(body:has(canvas[data-scene="about-exit"]) .site-nav) {
+  background: transparent;
+  backdrop-filter: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .canvas {
     transition: none;
