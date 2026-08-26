@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { ContactExperience } from "./ContactExperience";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Contact | Amal Engulatov",
-  description: "Contact Amal Engulatov.",
+  title: "Contact",
+  description: "Contact Amal Engulatov about frontend or full-stack opportunities.",
 };
 
 export default function ContactPage() {
-  return <ContactExperience />;
+  redirect("/#connect");
 }

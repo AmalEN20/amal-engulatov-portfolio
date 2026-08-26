@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { SiteNav } from "./components/SiteNav";
-import { SiteShell } from "./components/SiteShell";
-import "lenis/dist/lenis.css";
 import "./globals.css";
 
 const geist = Geist({
@@ -16,15 +13,40 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Amal — AI Full-Stack Developer",
-  description: "Amal is an AI full-stack developer based in Seattle, Washington.",
+  title: {
+    default: "Amal Engulatov — Full-Stack Developer",
+    template: "%s | Amal Engulatov",
+  },
+  description:
+    "Portfolio of Amal Engulatov, a full-stack developer and digital product builder based in Seattle, Washington.",
+  openGraph: {
+    type: "website",
+    title: "Amal Engulatov — Full-Stack Developer",
+    description:
+      "Selected full-stack work, capabilities, and contact information for Amal Engulatov.",
+    siteName: "Amal Engulatov",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Amal Engulatov — Full-Stack Developer",
+    description:
+      "Selected full-stack work, capabilities, and contact information for Amal Engulatov.",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.dataset.motion="enabled"}}catch(e){}',
+          }}
+        />
+      </head>
       <body className={`${geist.variable} ${geistMono.variable}`}>
-        <SiteShell navigation={<SiteNav />}>{children}</SiteShell>
+        {children}
       </body>
     </html>
   );

@@ -1,9 +1,5 @@
-import { HomeHero } from "./components/HomeHero";
+import { OnePagePortfolio } from "./components/OnePagePortfolio";
 
 export default function Home() {
-  return (
-    <main className="site-structure">
-      <HomeHero />
-    </main>
-  );
+  return <OnePagePortfolio />;
 }
