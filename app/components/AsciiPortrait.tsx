@@ -107,19 +107,21 @@ type EraseRect = {
 type AsciiPortraitProps = {
   aboutProgressRef?: RefObject<AboutFigureProgress>;
   className?: string;
+  embedded?: boolean;
   scrollProgressRef?: RefObject<number>;
 };
 
 export function AsciiPortrait({
   aboutProgressRef,
   className = "",
+  embedded = false,
   scrollProgressRef,
 }: AsciiPortraitProps) {
   const frameRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isReady, setIsReady] = useState(false);
   const canUseDOM = useSyncExternalStore(subscribeToClient, () => true, () => false);
-  const portalTarget = canUseDOM ? document.body : null;
+  const portalTarget = !embedded && canUseDOM ? document.body : null;
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -853,11 +855,13 @@ export function AsciiPortrait({
       const sourceWidth = source.naturalWidth;
       const sourceHeight = source.naturalHeight;
       const sourceAspect = sourceWidth / sourceHeight;
-      let drawHeight = rows * 0.8;
+      let drawHeight = rows * (embedded ? 0.9 : 0.8);
       let drawWidth = drawHeight * sourceAspect;
 
-      if (drawWidth > columns * 0.9) {
-        drawWidth = columns * 0.9;
+      const widthLimit = columns * (embedded ? 0.96 : 0.9);
+
+      if (drawWidth > widthLimit) {
+        drawWidth = widthLimit;
         drawHeight = drawWidth / sourceAspect;
       }
 
@@ -1127,26 +1131,36 @@ export function AsciiPortrait({
       window.removeEventListener("blur", handlePointerLeave);
       reducedMotion.removeEventListener("change", handleMotionChange);
     };
-  }, [aboutProgressRef, portalTarget, scrollProgressRef]);
+  }, [aboutProgressRef, embedded, portalTarget, scrollProgressRef]);
 
   return (
     <>
       <div
         ref={frameRef}
         className={`${styles.frame} ${className}`.trim()}
+        aria-hidden={embedded ? "true" : undefined}
+        data-embedded={embedded ? "true" : "false"}
         data-ready={isReady ? "true" : "false"}
       >
         <Image
-          alt="Portrait of Amal Engulatov"
+          alt={embedded ? "" : "Portrait of Amal Engulatov"}
           className={styles.fallback}
           fill
           loading="eager"
-          sizes="100vw"
+          sizes={embedded ? "(max-width: 900px) 0px, 470px" : "100vw"}
           src={SOURCE}
         />
+
+        {embedded ? (
+          <canvas
+            ref={canvasRef}
+            aria-hidden="true"
+            className={`${styles.canvas} ${styles.embeddedCanvas} ${isReady ? styles.canvasReady : ""}`.trim()}
+          />
+        ) : null}
       </div>
 
-      {portalTarget
+      {!embedded && portalTarget
         ? createPortal(
             <canvas
               ref={canvasRef}

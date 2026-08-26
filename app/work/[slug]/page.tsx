@@ -27,5 +27,5 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const project = getPortfolioProject(slug);
   if (!project) notFound();
 
-  redirect(`/#work-${project.slug}`);
+  redirect(`/#project-${project.slug}`);
 }

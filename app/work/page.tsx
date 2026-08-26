@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function ProjectsPage() {
-  redirect("/#selected-work");
+  redirect("/#projects");
 }

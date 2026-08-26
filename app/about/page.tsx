@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
-  redirect("/#capabilities");
+  redirect("/#bio");
 }

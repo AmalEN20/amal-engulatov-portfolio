@@ -19,14 +19,19 @@ export const portfolioContent = {
     name: "Amal Engulatov",
     role: "Full-Stack Developer & Digital Product Builder",
     location: "Seattle, Washington",
-    bio:
+    bio: [
       "I build focused websites and web products across interfaces, application logic, data, and integrations.",
+      "My work spans product structure, frontend systems, edge-backed application logic, and the motion details that make an interface feel considered.",
+    ],
     availability: "Open to frontend and full-stack opportunities.",
   },
-  navigation: [
-    { href: "#selected-work", label: "Work" },
-    { href: "#capabilities", label: "Capabilities" },
-    { href: "#connect", label: "Connect" },
+  notes: [
+    "Motion should clarify the reading order",
+    "AI actions should remain approval-gated",
+    "Responsive design is a separate edit",
+    "A build is not proof of smoothness",
+    "Small interfaces can contain deep systems",
+    "Product decisions should stay evidence-led",
   ],
   projects: [
     {
@@ -64,35 +69,24 @@ export const portfolioContent = {
       year: "2026",
     },
   ] satisfies readonly PortfolioProject[],
-  capabilities: [
+  experiments: [
     {
-      title: "Product interfaces",
+      title: "Interface motion",
       description:
-        "Responsive, accessible interfaces in React, Next.js, and TypeScript, including motion systems that support the content.",
+        "Masked text, route continuity, and scroll-linked pacing built with the DOM first.",
+      area: "Motion",
     },
     {
-      title: "Application systems",
+      title: "Approval-gated AI workflows",
       description:
-        "Full-stack workflows spanning application logic, APIs, Cloudflare Workers, D1, and Drizzle-backed data models.",
+        "Research, evidence checks, and outreach drafts that keep external actions under human control.",
+      area: "AI systems",
     },
     {
-      title: "Product delivery",
+      title: "Edge application stacks",
       description:
-        "From product structure and implementation through desktop, mobile, accessibility, and motion QA.",
-    },
-  ],
-  education: [
-    {
-      institution: "University of Washington",
-      credential: "Full Stack Web Development Boot Camp Certificate",
-    },
-    {
-      institution: "Meta",
-      credential: "Front-End Developer Professional Certificate",
-    },
-    {
-      institution: "Bellevue College",
-      credential: "Associate Degree Transfer Program — In Progress",
+        "Cloudflare Workers, D1, and Drizzle as a compact full-stack deployment model.",
+      area: "Full-stack",
     },
   ],
   links: {

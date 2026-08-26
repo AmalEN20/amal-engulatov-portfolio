@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ContactForm } from "../components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -7,5 +8,23 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-  redirect("/#connect");
+  return (
+    <>
+      <a className="skip-link" href="#contact-form">
+        Skip to form
+      </a>
+      <main className="utility-page" id="contact-form">
+        <Link className="utility-back" href="/">
+          ← Amal Engulatov
+        </Link>
+        <header className="utility-header">
+          <h1>Contact</h1>
+          <p>
+            For frontend or full-stack opportunities, share the role, product, or problem you are working on.
+          </p>
+        </header>
+        <ContactForm />
+      </main>
+    </>
+  );
 }

@@ -1,53 +1,62 @@
-# Amal Portfolio — one-page motion contract
+# Amal Portfolio — compact Lee-structure / heavy-scroll contract
 
 ## 1. Narrative purpose and legible information
 
-The page must identify Amal Engulatov as a full-stack developer and digital product builder, show two verified projects, explain concrete capabilities and education, and provide two verified connection paths: GitHub and the existing contact form. Every resting frame must remain readable. There is no portrait, loader message, decorative illustration, invented history, metric, client, résumé, email, LinkedIn, or live-project URL.
+The page must identify Amal Engulatov as a full-stack developer and digital product builder through a compact left reading column ordered as `Bio → Notes → Projects → Experiments`. A separate right visual column reuses Amal's existing ASCII/pixel portrait renderer as a personal identity layer. Notes are short working principles, not claims of published articles. Projects remain limited to EVELE STUDIO and Amal AI Studio. Every resting frame must remain readable. There is no section numbering, loader, invented history, metric, client, résumé, email, LinkedIn, or live-project URL.
 
 ## 2. Entry sequence and timing hierarchy
 
-Cold load uses one CSS-owned sequence. `Amal` and `Engulatov` rise from word masks first. The role follows while the second name word is still settling. Bio, availability, compact anchors, and the first divider enter as blocks with 70–90ms overlap. Total meaningful identity entry stays below 1.3 seconds. The start transform is approximately `translateY(112%)` for name words and `translateY(18–24px)` for supporting blocks; the target easing is an original strong deceleration curve.
+Cold load follows the audited Cuberto text mechanics through an original CSS implementation. The two name words begin at approximately `translateY(118%)` inside padded clip masks, stay fully opaque, and settle with a strong deceleration over roughly 1.35 seconds. The second word starts about 90ms after the first. Role and Bio copy use block masks with 70–110ms overlap; Notes, Projects, Experiments, and the footer continue the same hierarchy. Hairline dividers scale from the left with the same easing and overlap the adjacent copy rather than waiting for it to finish.
+
+A tiny fail-open head script arms CSS entry motion only for a fresh navigation or reload, not Back/Forward. It removes the capability flag after the sequence. If the script is blocked, server-rendered content is already in its final state. If hydration fails after the flag is set, CSS animations still complete without a React timer or body lock.
 
 The sequence is gated only by an early capability flag. If JavaScript is disabled, blocked, or hydration fails, the flag is absent and server-rendered content is visible immediately. There is no curtain, body lock, navigation delay, React timer, or hydration-owned completion state.
 
 ## 3. Scroll interval and stopped frames
 
-- Start: the identity group is complete and the first divider establishes the reading column.
-- Middle: `Selected Work` rows enter as complete semantic groups; title, responsibility, summary, stack, and available action remain readable together.
-- Late: capabilities and education use the same restrained block rhythm, with no pinning or competing parallax.
-- End: Connect and the form rest as an ordinary document section with stable labels, controls, and actions.
+- Start: name, role, and Bio establish the complete identity without a viewport-height hero.
+- Middle: Notes use a compact two-column desktop list; Projects use simple title/meta rows with hairline separators.
+- Late: Experiments use the same row grammar and remain short enough to scan without a staged reveal.
+- End: a minimal footer exposes GitHub and the preserved Contact route.
 
-On supporting browsers, below-fold section headings and row groups use a shallow CSS view-timeline translation/fade. The default, unsupported, and failure states are fully visible. No content depends on crossing a JavaScript threshold.
+Desktop/fine-pointer wheel input is smoothed by one Lenis instance. Target feel: a direct initial response followed by approximately 1.0–1.4 seconds of controlled deceleration. The right portrait is fixed to the viewport bottom. Its frame, glyph positions, scale, opacity, and animation state do not depend on scroll progress. No content section is pinned and no content position is scrubbed.
 
 ## 4. Exit and reverse behavior
 
-The one-page document has no page-local route exit. Anchor navigation is immediate and native. CSS view-timeline enhancement reverses continuously with scroll without threshold flicker; stopped frames keep complete readable groups. Legacy URLs redirect to section anchors. Back/Forward must restore the expected URL/anchor without replaying a React intro or trapping focus.
+The one-page document has no page-local route exit. Anchor links are handed to the same Lenis owner on desktop and remain native on touch/reduced motion. Reverse input must respond immediately and ease without overshoot. Legacy URLs redirect to stable anchors. Back/Forward must restore the expected URL/anchor without replaying an intro or trapping focus.
 
 ## 5. Layer ownership
 
 - Semantic structure, content, lists, links, form controls: server-rendered DOM.
-- Word masks, block reveals, hover/focus feedback, dividers, optional view progress: CSS.
-- Cold-load capability flag: a tiny inline script that makes no content or navigation decisions.
+- Layout, hover/focus feedback, dividers, and any shallow entry: CSS.
+- Wheel inertia: one client-only Lenis owner in the root layout, one RAF, fine-pointer only.
+- Pixel portrait: the existing client Canvas 2D renderer in embedded mode, scoped to the right visual frame; its source asset and sampling algorithm remain local.
 - Contact submission: the existing `ContactForm` and Formspree contract, unchanged.
 - Metadata/social card: Next.js metadata and server-rendered `ImageResponse`.
-- Canvas, WebGL, SVG choreography, video, Lenis, GSAP, observers, timers, scroll listeners, and RAF: not used.
+- GSAP, ScrollTrigger, WebGL, SVG choreography, video, body locks, and scroll-driven portrait timelines: not used.
 
 ## 6. Desktop, mobile, and reduced-motion variants
 
-- Desktop 1440×900: one centered column, maximum readable width around 700px, compact and consistent section rhythm, project rows with two-column metadata where useful.
-- Mobile 390×844 and 430×932: 20px side padding, single-column project details, wrapped actions, native touch scroll, safe word masks, and at least 44px interactive targets.
-- Reduced motion: all transforms and animations are removed; content renders at its final state; native scroll and immediate anchor navigation remain.
+- Desktop 1440×900: a 600px copy column and a larger frameless pixel silhouette fixed to the bottom-right viewport edge.
+- Responsive breakpoint: the visual exists at `1100px` and above; at `1099px` and below it is completely removed, matching the measured Lee breakpoint.
+- Mobile 390×844 and 430×932: no portrait or portrait placeholder; content uses 20px side padding, one-column Notes, native touch scroll, and at least 44px interactive targets.
+- Reduced motion: Lenis is never created; the portrait renders one static Canvas frame without a continuous RAF; all content is immediately visible.
 
 ## 7. Performance budget and cleanup owner
 
-No client animation dependency, media request, persistent frame loop, observer, listener, body lock, or WebGL context is introduced. Animations use transform, opacity, and scale only. Font ownership remains the existing Geist Sans and Geist Mono registration. The browser owns CSS animation cleanup; the contact component owns only its existing form state.
+Budget: one Lenis instance/RAF for desktop wheel plus one visible portrait RAF; portrait DPR remains capped at 1.5 desktop and 1.15 coarse pointer, and its IntersectionObserver suspends drawing offscreen. No ScrollTrigger, WebGL, video, body lock, or scroll listener is introduced. `HeavyScroll` owns Lenis cleanup; `AsciiPortrait` owns its Canvas RAF, ResizeObserver, IntersectionObserver, pointer listener, media listener, and cleanup. Native touch is preserved.
 
 ## 8. Acceptance checks
 
 - One semantic H1 with the complete accessible name; visual fragments cannot alter it.
 - Content remains visible with JavaScript disabled and after simulated hydration failure.
 - No clipped descenders at entry end; long words wrap safely at 390px and 430px.
-- Cold load, refresh, middle, final, slow/fast/stop/reverse frames are intentional.
+- Bio, Notes, Projects, and Experiments appear in that order with no numeric labels.
+- Cold load, refresh, middle, final, slow/fast/abrupt-stop/reverse frames are intentional.
+- Desktop wheel decelerates without delaying the initial response; touch and reduced motion stay native.
+- The portrait has no visible frame or background, begins at the viewport bottom, never covers copy, never reacts to scroll progress, and stops its RAF under reduced motion or when removed from the route.
+- Word masks preserve one semantic accessible name and protect descenders; reduced motion removes transforms and delays.
+- Every visible horizontal divider reaches full width without overshoot or a one-pixel final gap.
 - Hover and `:focus-visible` feedback are visible; keyboard order follows document order.
 - Skip link, headings, lists, labels, live form status, and real links remain semantic.
 - Anchors, duplicate clicks, legacy redirects, and Back/Forward work without a route curtain.
