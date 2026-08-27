@@ -4,7 +4,7 @@ import { ContactForm } from "../components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Contact Amal Engulatov about frontend or full-stack opportunities.",
+  description: "Contact Amal E about frontend or full-stack opportunities.",
 };
 
 export default function ContactPage() {
@@ -15,7 +15,7 @@ export default function ContactPage() {
       </a>
       <main className="utility-page" id="contact-form">
         <Link className="utility-back" href="/">
-          ← Amal Engulatov
+          ← Amal E
         </Link>
         <header className="utility-header">
           <h1>Contact</h1>

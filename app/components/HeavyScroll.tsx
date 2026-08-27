@@ -39,7 +39,23 @@ export function HeavyScroll({ children }: { children: React.ReactNode }) {
         frameId = window.requestAnimationFrame(frame);
       };
 
+      if (document.documentElement.dataset.projectDialog === "open") {
+        lenis.stop();
+      }
+
       frameId = window.requestAnimationFrame(frame);
+    };
+
+    const syncProjectDialogLock = () => {
+      if (!lenis) return;
+
+      if (document.documentElement.dataset.projectDialog === "open") {
+        lenis.stop();
+      } else {
+        lenis.resize();
+        lenis.scrollTo(window.scrollY, { immediate: true, force: true });
+        lenis.start();
+      }
     };
 
     sync();
@@ -50,11 +66,13 @@ export function HeavyScroll({ children }: { children: React.ReactNode }) {
     finePointer.addEventListener("change", sync);
     reducedMotion.addEventListener("change", sync);
     window.addEventListener("pageshow", restoreFromPageCache);
+    window.addEventListener("amal:project-dialog-lock", syncProjectDialogLock);
 
     return () => {
       finePointer.removeEventListener("change", sync);
       reducedMotion.removeEventListener("change", sync);
       window.removeEventListener("pageshow", restoreFromPageCache);
+      window.removeEventListener("amal:project-dialog-lock", syncProjectDialogLock);
       destroy();
     };
   }, []);

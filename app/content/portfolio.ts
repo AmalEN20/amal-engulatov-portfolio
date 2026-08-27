@@ -6,9 +6,10 @@ export type PortfolioProject = {
   summary: string;
   description: string;
   stack: readonly string[];
+  websiteUrl?: string;
+  websiteLabel: string;
   repositoryUrl?: string;
   repositoryLabel: string;
-  sourceStatus: string;
   imageSrc: string;
   imageAlt: string;
   year: string;
@@ -16,22 +17,31 @@ export type PortfolioProject = {
 
 export const portfolioContent = {
   identity: {
-    name: "Amal Engulatov",
+    name: "Amal E",
     role: "Full-Stack Developer & Digital Product Builder",
     location: "Seattle, Washington",
     bio: [
-      "I build focused websites and web products across interfaces, application logic, data, and integrations.",
-      "My work spans product structure, frontend systems, edge-backed application logic, and the motion details that make an interface feel considered.",
+      "I build full-stack web products that connect responsive interfaces with application logic, relational data, APIs, and practical AI-assisted workflows.",
+      "My work spans Next.js and TypeScript frontends, Cloudflare-backed services, accessible motion systems, debugging, performance, and cross-device QA.",
     ],
-    availability: "Open to frontend and full-stack opportunities.",
   },
-  notes: [
-    "Motion should clarify the reading order",
-    "AI actions should remain approval-gated",
-    "Responsive design is a separate edit",
-    "A build is not proof of smoothness",
-    "Small interfaces can contain deep systems",
-    "Product decisions should stay evidence-led",
+  experience: [
+    {
+      organization: "IHealth and Wellness Foundation",
+      role: "Software Engineer",
+      period: "Aug 2023 — Jul 2026",
+      location: "Remote",
+      description:
+        "Developed and maintained frontend updates across a multi-page website, resolved responsive layout and interaction issues, refactored existing code, and validated fixes across desktop and mobile.",
+    },
+    {
+      organization: "Independent",
+      role: "Freelance Full-Stack Web Developer",
+      period: "2025 — Present",
+      location: "Seattle, Washington",
+      description:
+        "Build responsive websites and full-stack products across frontend, backend logic, APIs, relational data, third-party integrations, and AI-assisted business workflows.",
+    },
   ],
   projects: [
     {
@@ -44,9 +54,10 @@ export const portfolioContent = {
       description:
         "I designed and built the frontend in Next.js, React, and TypeScript, including the responsive experience and motion system. The source repository is private.",
       stack: ["Next.js", "React", "TypeScript", "Motion systems"],
+      websiteUrl: "https://evele.studio",
+      websiteLabel: "Visit live website",
       repositoryUrl: undefined,
-      repositoryLabel: "Private source repository",
-      sourceStatus: "Private source",
+      repositoryLabel: "Code · Private source",
       imageSrc: "/projects/evele-studio-home.jpg",
       imageAlt: "EVELE STUDIO homepage with a large EVELE wordmark on a dark background",
       year: "2026",
@@ -61,36 +72,35 @@ export const portfolioContent = {
       description:
         "I built the application across the Next.js interface, Cloudflare Workers, D1 data layer, and Drizzle schema while keeping external actions behind explicit human approval.",
       stack: ["Next.js", "TypeScript", "Cloudflare Workers", "D1", "Drizzle"],
+      websiteUrl: undefined,
+      websiteLabel: "Live site not published",
       repositoryUrl: "https://github.com/AmalEN20/amal-ai-studio",
-      repositoryLabel: "View GitHub repository",
-      sourceStatus: "Public source",
+      repositoryLabel: "View source code",
       imageSrc: "/projects/amal-ai-studio-dashboard.png",
       imageAlt: "Amal AI Studio dashboard showing a client research pipeline",
       year: "2026",
     },
   ] satisfies readonly PortfolioProject[],
-  experiments: [
+  education: [
     {
-      title: "Interface motion",
-      description:
-        "Masked text, route continuity, and scroll-linked pacing built with the DOM first.",
-      area: "Motion",
+      institution: "University of Washington",
+      credential: "Full Stack Web Development Boot Camp Certificate",
+      status: "Certificate",
     },
     {
-      title: "Approval-gated AI workflows",
-      description:
-        "Research, evidence checks, and outreach drafts that keep external actions under human control.",
-      area: "AI systems",
+      institution: "Meta",
+      credential: "Front-End Developer Professional Certificate",
+      status: "Certificate",
     },
     {
-      title: "Edge application stacks",
-      description:
-        "Cloudflare Workers, D1, and Drizzle as a compact full-stack deployment model.",
-      area: "Full-stack",
+      institution: "Bellevue College",
+      credential: "Associate Degree Transfer Program",
+      status: "In Progress",
     },
   ],
   links: {
     github: "https://github.com/AmalEN20",
+    linkedin: "https://www.linkedin.com/in/amal-engulatov-18b144277/",
   },
 } as const;
 

@@ -1143,7 +1143,7 @@ export function AsciiPortrait({
         data-ready={isReady ? "true" : "false"}
       >
         <Image
-          alt={embedded ? "" : "Portrait of Amal Engulatov"}
+          alt={embedded ? "" : "Portrait of Amal E"}
           className={styles.fallback}
           fill
           loading="eager"

@@ -1,0 +1,364 @@
+"use client";
+
+import type { CSSProperties, ReactNode } from "react";
+import { Fragment, useEffect, useId, useRef, useState } from "react";
+import type { PortfolioProject } from "../content/portfolio";
+
+type ProjectDialogProps = {
+  children: ReactNode;
+  project: PortfolioProject;
+};
+
+const dialogMotionStyle = (delay: number) =>
+  ({ "--dialog-delay": `${delay}ms` } as CSSProperties);
+
+function DialogWords({
+  delay,
+  stagger = 52,
+  text,
+}: {
+  delay: number;
+  stagger?: number;
+  text: string;
+}) {
+  return text.split(" ").map((word, index, words) => (
+    <Fragment key={`${word}-${index}`}>
+      <span className="dialog-word-mask" aria-hidden="true">
+        <span className="dialog-reveal-word" style={dialogMotionStyle(delay + index * stagger)}>
+          {word}
+        </span>
+      </span>
+      {index < words.length - 1 ? " " : null}
+    </Fragment>
+  ));
+}
+
+function DialogBlock({ children, delay }: { children: ReactNode; delay: number }) {
+  return (
+    <span className="dialog-block-mask" aria-hidden="true">
+      <span className="dialog-reveal-block" style={dialogMotionStyle(delay)}>
+        {children}
+      </span>
+    </span>
+  );
+}
+
+export function ProjectDialog({ children, project }: ProjectDialogProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeTimerRef = useRef<number | null>(null);
+  const closeFrameRef = useRef<number | null>(null);
+  const closeAnimationEndRef = useRef<((event: AnimationEvent) => void) | null>(null);
+  const focusFrameRef = useRef<number | null>(null);
+  const closingRef = useRef(false);
+  const originalPageStylesRef = useRef<{
+    bodyOverflow: string;
+    bodyPaddingRight: string;
+    bodyPosition: string;
+    bodyTop: string;
+    bodyWidth: string;
+    rootOverflow: string;
+    scrollY: number;
+  } | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const dialogId = useId();
+  const titleId = `${dialogId}-title`;
+  const summaryId = `${dialogId}-summary`;
+
+  const clearCloseTimer = () => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const clearCloseAnimationListener = () => {
+    const listener = closeAnimationEndRef.current;
+
+    if (listener && dialogRef.current) {
+      dialogRef.current.removeEventListener("animationend", listener);
+    }
+
+    closeAnimationEndRef.current = null;
+  };
+
+  const unlockPage = () => {
+    const originalStyles = originalPageStylesRef.current;
+
+    if (!originalStyles) {
+      return;
+    }
+
+    document.body.style.overflow = originalStyles.bodyOverflow;
+    document.body.style.paddingRight = originalStyles.bodyPaddingRight;
+    document.body.style.position = originalStyles.bodyPosition;
+    document.body.style.top = originalStyles.bodyTop;
+    document.body.style.width = originalStyles.bodyWidth;
+    document.documentElement.style.overflow = originalStyles.rootOverflow;
+    originalPageStylesRef.current = null;
+    window.scrollTo({ top: originalStyles.scrollY, left: 0, behavior: "auto" });
+    delete document.documentElement.dataset.projectDialog;
+    window.dispatchEvent(new Event("amal:project-dialog-lock"));
+  };
+
+  const handleClosed = () => {
+    clearCloseTimer();
+    clearCloseAnimationListener();
+    unlockPage();
+    closingRef.current = false;
+    setIsOpen(false);
+    setIsClosing(false);
+
+    focusFrameRef.current = window.requestAnimationFrame(() => {
+      triggerRef.current?.focus({ preventScroll: true });
+      focusFrameRef.current = null;
+    });
+  };
+
+  const closeImmediately = () => {
+    clearCloseTimer();
+    clearCloseAnimationListener();
+
+    if (dialogRef.current?.open) {
+      dialogRef.current.close();
+    } else {
+      handleClosed();
+    }
+  };
+
+  const requestClose = () => {
+    const dialog = dialogRef.current;
+
+    if (!dialog?.open || closingRef.current) {
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      closeImmediately();
+      return;
+    }
+
+    closingRef.current = true;
+    setIsClosing(true);
+
+    const handleExitComplete = (event: AnimationEvent) => {
+      if (event.target !== dialog || event.animationName !== "project-curtain-out") {
+        return;
+      }
+
+      clearCloseTimer();
+      clearCloseAnimationListener();
+      closeFrameRef.current = window.requestAnimationFrame(() => {
+        closeFrameRef.current = null;
+        closeImmediately();
+      });
+    };
+
+    closeAnimationEndRef.current = handleExitComplete;
+    dialog.addEventListener("animationend", handleExitComplete);
+    closeTimerRef.current = window.setTimeout(closeImmediately, 900);
+  };
+
+  const openDialog = () => {
+    const dialog = dialogRef.current;
+
+    if (!dialog || dialog.open) {
+      return;
+    }
+
+    originalPageStylesRef.current = {
+      bodyOverflow: document.body.style.overflow,
+      bodyPaddingRight: document.body.style.paddingRight,
+      bodyPosition: document.body.style.position,
+      bodyTop: document.body.style.top,
+      bodyWidth: document.body.style.width,
+      rootOverflow: document.documentElement.style.overflow,
+      scrollY: window.scrollY,
+    };
+
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.dataset.projectDialog = "open";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${originalPageStylesRef.current.scrollY}px`;
+    document.body.style.width = "100%";
+
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    window.dispatchEvent(new Event("amal:project-dialog-lock"));
+    closingRef.current = false;
+    setIsClosing(false);
+    dialog.showModal();
+    dialog.focus({ preventScroll: true });
+    setIsOpen(true);
+  };
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+
+    return () => {
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current);
+      }
+
+      if (closeFrameRef.current !== null) {
+        window.cancelAnimationFrame(closeFrameRef.current);
+      }
+
+      const closeListener = closeAnimationEndRef.current;
+
+      if (closeListener && dialog) {
+        dialog.removeEventListener("animationend", closeListener);
+      }
+
+      if (focusFrameRef.current !== null) {
+        window.cancelAnimationFrame(focusFrameRef.current);
+      }
+
+      const originalStyles = originalPageStylesRef.current;
+
+      if (originalStyles) {
+        document.body.style.overflow = originalStyles.bodyOverflow;
+        document.body.style.paddingRight = originalStyles.bodyPaddingRight;
+        document.body.style.position = originalStyles.bodyPosition;
+        document.body.style.top = originalStyles.bodyTop;
+        document.body.style.width = originalStyles.bodyWidth;
+        document.documentElement.style.overflow = originalStyles.rootOverflow;
+        window.scrollTo({ top: originalStyles.scrollY, left: 0, behavior: "auto" });
+        delete document.documentElement.dataset.projectDialog;
+        window.dispatchEvent(new Event("amal:project-dialog-lock"));
+      }
+    };
+  }, []);
+
+  return (
+    <>
+      <button
+        ref={triggerRef}
+        className="entry-row project-trigger"
+        type="button"
+        aria-controls={dialogId}
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
+        aria-label={`Open details for ${project.title}`}
+        onClick={openDialog}
+      >
+        {children}
+      </button>
+
+      <dialog
+        ref={dialogRef}
+        className="project-dialog"
+        data-closing={isClosing ? "true" : undefined}
+        data-lenis-prevent
+        id={dialogId}
+        tabIndex={-1}
+        aria-labelledby={titleId}
+        aria-describedby={summaryId}
+        onCancel={(event) => {
+          event.preventDefault();
+          requestClose();
+        }}
+        onClick={(event) => {
+          const rect = event.currentTarget.getBoundingClientRect();
+          const clickedOutside =
+            event.clientX < rect.left ||
+            event.clientX > rect.right ||
+            event.clientY < rect.top ||
+            event.clientY > rect.bottom;
+
+          if (clickedOutside) {
+            requestClose();
+          }
+        }}
+        onClose={handleClosed}
+      >
+        <div className="project-dialog-panel">
+          <div className="project-dialog-topline">
+            <button className="project-dialog-close" type="button" onClick={requestClose}>
+              Close <span aria-hidden="true">×</span>
+            </button>
+          </div>
+
+          <h2 id={titleId} aria-label={project.title}>
+            <DialogWords delay={220} stagger={48} text={project.title} />
+          </h2>
+
+          <p className="project-dialog-summary" id={summaryId} aria-label={project.summary}>
+            <DialogBlock delay={340}>{project.summary}</DialogBlock>
+          </p>
+
+          <div className="project-dialog-divider" aria-hidden="true" />
+
+          <p className="project-dialog-description" aria-label={project.description}>
+            <DialogBlock delay={450}>{project.description}</DialogBlock>
+          </p>
+
+          <dl className="project-dialog-details">
+            <div>
+              <dt aria-label="Responsibility">
+                <DialogBlock delay={530}>Responsibility</DialogBlock>
+              </dt>
+              <dd aria-label={project.responsibility}>
+                <DialogBlock delay={580}>{project.responsibility}</DialogBlock>
+              </dd>
+            </div>
+            <div>
+              <dt aria-label="Stack">
+                <DialogBlock delay={570}>Stack</DialogBlock>
+              </dt>
+              <dd>
+                <ul aria-label="Technology stack">
+                  {project.stack.map((technology, index) => (
+                    <li key={technology} aria-label={technology}>
+                      <DialogBlock delay={620 + index * 38}>{technology}</DialogBlock>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          </dl>
+
+          <nav className="project-dialog-actions" aria-label={`${project.title} links`}>
+            {project.websiteUrl ? (
+              <a
+                href={project.websiteUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${project.websiteLabel}, opens in a new tab`}
+              >
+                <DialogBlock delay={760}>
+                  {project.websiteLabel} <span aria-hidden="true">↗</span>
+                </DialogBlock>
+              </a>
+            ) : (
+              <span aria-label={project.websiteLabel}>
+                <DialogBlock delay={760}>{project.websiteLabel}</DialogBlock>
+              </span>
+            )}
+            {project.repositoryUrl ? (
+              <a
+                href={project.repositoryUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${project.repositoryLabel}, opens in a new tab`}
+              >
+                <DialogBlock delay={820}>
+                  {project.repositoryLabel} <span aria-hidden="true">↗</span>
+                </DialogBlock>
+              </a>
+            ) : (
+              <span aria-label={project.repositoryLabel}>
+                <DialogBlock delay={820}>{project.repositoryLabel}</DialogBlock>
+              </span>
+            )}
+          </nav>
+        </div>
+      </dialog>
+    </>
+  );
+}

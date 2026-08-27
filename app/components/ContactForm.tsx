@@ -9,7 +9,7 @@ export function ContactForm() {
   const [values, setValues] = useState({ name: "", email: "", message: "" });
   const [state, handleSubmit, reset] = useForm(FORMSPREE_FORM_ID, {
     data: {
-      subject: "New portfolio enquiry for Amal Engulatov",
+      subject: "New portfolio enquiry for Amal E",
       source: "amal-engulatov-portfolio",
     },
   });
@@ -33,8 +33,8 @@ export function ContactForm() {
   }
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit} aria-label="Contact Amal Engulatov">
-      <input type="hidden" name="_subject" value="New portfolio enquiry for Amal Engulatov" />
+    <form className="contact-form" onSubmit={handleSubmit} aria-label="Contact Amal E">
+      <input type="hidden" name="_subject" value="New portfolio enquiry for Amal E" />
 
       <div className="contact-honeypot" aria-hidden="true">
         <label htmlFor="website-check">Leave this field empty</label>

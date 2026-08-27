@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const socialImageAlt =
-  "Amal Engulatov — Full-Stack Developer and Digital Product Builder";
+  "Amal E — Full-Stack Developer and Digital Product Builder";
 export const socialImageSize = { width: 1200, height: 630 };
 export const socialImageContentType = "image/png";
 
@@ -27,14 +27,14 @@ export function createSocialImage() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ fontSize: 88, letterSpacing: "-5px", lineHeight: 0.92 }}>
-            Amal Engulatov
+            Amal E
           </div>
           <div style={{ color: "#666662", fontSize: 34, letterSpacing: "-1px" }}>
             Full-Stack Developer &amp; Digital Product Builder
           </div>
         </div>
         <div style={{ display: "flex", width: "100%", borderTop: "1px solid #d8d8d2", paddingTop: 24, color: "#777772", fontSize: 22 }}>
-          Bio / Notes / Projects / Experiments
+          Bio / Experience / Projects / Education / Notes
         </div>
       </div>
     ),

@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
 import { Fragment } from "react";
-import Link from "next/link";
 import { portfolioContent } from "../content/portfolio";
 import { AsciiPortrait } from "./AsciiPortrait";
+import { ProjectDialog } from "./ProjectDialog";
 
 const motionStyle = (revealDelay: number, lineDelay = revealDelay) =>
   ({
@@ -25,8 +25,33 @@ function MaskedWords({ text, delay }: { text: string; delay: number }) {
   ));
 }
 
-export function OnePagePortfolio() {
-  const { identity, notes, projects, experiments, links } = portfolioContent;
+function MaskedCopy({
+  text,
+  delay,
+  stagger = 24,
+}: {
+  text: string;
+  delay: number;
+  stagger?: number;
+}) {
+  const words = text.split(" ");
+
+  return words.map((word, index) => (
+    <Fragment key={`${word}-${index}`}>
+      <span className="copy-word-mask" aria-hidden="true">
+        <span className="reveal-copy-word" style={motionStyle(delay + index * stagger)}>
+          {word}
+        </span>
+      </span>
+      {index < words.length - 1 ? " " : null}
+    </Fragment>
+  ));
+}
+
+export type PortfolioTypeStyle = "geist" | "instrument" | "plex";
+
+export function OnePagePortfolio({ typeStyle = "geist" }: { typeStyle?: PortfolioTypeStyle }) {
+  const { identity, experience, projects, education, links } = portfolioContent;
 
   return (
     <>
@@ -34,57 +59,65 @@ export function OnePagePortfolio() {
         Skip to content
       </a>
 
-      <main className="portfolio-page" id="main-content">
+      <main className="portfolio-page" data-type-style={typeStyle} id="main-content">
         <article className="home-copy">
-          <header className="profile-header">
-            <h1 aria-label={identity.name}>
-              <MaskedWords delay={110} text={identity.name} />
-            </h1>
-            <p className="block-mask">
-              <span className="reveal-block silver-detail" style={motionStyle(390)}>
-                {identity.role}
-              </span>
-            </p>
-          </header>
-
-          <section className="bio-section" id="bio" aria-labelledby="bio-title">
-            <div className="bio-label-row" style={motionStyle(500, 440)}>
-              <h2 id="bio-title" aria-label="Bio">
-                <MaskedWords delay={500} text="Bio" />
-              </h2>
-              <span className="block-mask">
-                <span className="reveal-block silver-detail" style={motionStyle(560)}>
-                  {identity.location}
+          <section className="intro-section" id="bio" aria-label="Introduction">
+            <header className="profile-header">
+              <h1 aria-label={identity.name}>
+                <MaskedWords delay={110} text={identity.name} />
+              </h1>
+              <div className="profile-meta" style={motionStyle(340, 410)}>
+                <p aria-label={identity.role}>
+                  <MaskedCopy delay={310} stagger={26} text={identity.role} />
+                </p>
+                <span aria-label={identity.location}>
+                  <MaskedCopy delay={390} text={identity.location} />
                 </span>
-              </span>
-            </div>
-            <div className="bio-copy">
+              </div>
+            </header>
+            <div className="intro-copy">
               {identity.bio.map((paragraph, index) => (
-                <p className="block-mask" key={paragraph}>
-                  <span className="reveal-block" style={motionStyle(630 + index * 120)}>
-                    {paragraph}
-                  </span>
+                <p aria-label={paragraph} key={paragraph}>
+                  <MaskedCopy delay={510 + index * 170} text={paragraph} />
                 </p>
               ))}
-              <p className="availability entry-reveal" style={motionStyle(880)}>
-                <span className="availability-dot" aria-hidden="true" />
-                {identity.availability}
-              </p>
             </div>
           </section>
 
-          <section className="portfolio-section" id="notes" aria-labelledby="notes-title">
-            <h2 id="notes-title" aria-label="Notes">
-              <MaskedWords delay={960} text="Notes" />
+          <section className="portfolio-section" id="experience" aria-labelledby="experience-title">
+            <h2 id="experience-title" aria-label="Experience">
+              <MaskedWords delay={880} text="Experience" />
             </h2>
-            <ul className="notes-list">
-              {notes.map((note, index) => (
-                <li key={note}>
-                  <span className="block-mask">
-                    <span className="reveal-block" style={motionStyle(1050 + index * 65)}>
-                      {note}
-                    </span>
-                  </span>
+            <ul className="entry-list experience-list" style={motionStyle(940, 850)}>
+              {experience.map((item, index) => (
+                <li
+                  key={`${item.organization}-${item.role}`}
+                  style={motionStyle(960 + index * 130, 920 + index * 120)}
+                >
+                  <article className="experience-entry">
+                    <div className="experience-title-row">
+                      <h3 aria-label={item.role}>
+                        <MaskedCopy delay={960 + index * 130} text={item.role} />
+                      </h3>
+                      {item.organization !== "Independent" ? (
+                        <p className="experience-company" aria-label={item.organization}>
+                          <MaskedCopy delay={1010 + index * 130} text={item.organization} />
+                        </p>
+                      ) : null}
+                    </div>
+                    <p
+                      className="experience-period"
+                      aria-label={`${item.period}, ${item.location}`}
+                    >
+                      <MaskedCopy
+                        delay={1060 + index * 130}
+                        text={`${item.period} · ${item.location}`}
+                      />
+                    </p>
+                    <p className="experience-description" aria-label={item.description}>
+                      <MaskedCopy delay={1110 + index * 130} stagger={19} text={item.description} />
+                    </p>
+                  </article>
                 </li>
               ))}
             </ul>
@@ -92,74 +125,77 @@ export function OnePagePortfolio() {
 
           <section className="portfolio-section" id="projects" aria-labelledby="projects-title">
             <h2 id="projects-title" aria-label="Projects">
-              <MaskedWords delay={1220} text="Projects" />
+              <MaskedWords delay={1260} text="Projects" />
             </h2>
-            <ul className="entry-list" style={motionStyle(1280, 1190)}>
+            <ul className="entry-list" style={motionStyle(1320, 1230)}>
               {projects.map((project, index) => (
                 <li
                   id={`project-${project.slug}`}
                   key={project.slug}
-                  style={motionStyle(1320 + index * 110, 1260 + index * 100)}
+                  style={motionStyle(1340 + index * 130, 1300 + index * 120)}
                 >
-                  {project.repositoryUrl ? (
-                    <a
-                      className="entry-row entry-reveal"
-                      href={project.repositoryUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <span>
-                        <strong>{project.title}</strong>
-                        <small>{project.category}</small>
-                      </span>
-                      <span className="entry-meta">
-                        {project.year} <span aria-hidden="true">↗</span>
-                      </span>
-                    </a>
-                  ) : (
-                    <div className="entry-row entry-reveal">
-                      <span>
-                        <strong>{project.title}</strong>
-                        <small>{project.category}</small>
-                      </span>
-                      <span className="entry-meta">{project.year} · Private</span>
-                    </div>
-                  )}
+                  <ProjectDialog project={project}>
+                    <span>
+                      <strong>
+                        <MaskedCopy delay={1340 + index * 130} text={project.title} />
+                      </strong>
+                      <small>
+                        <MaskedCopy delay={1400 + index * 130} text={project.category} />
+                      </small>
+                    </span>
+                    <span className="entry-meta">
+                      <MaskedCopy delay={1380 + index * 130} text={`${project.year} · Open`} />
+                    </span>
+                  </ProjectDialog>
                 </li>
               ))}
             </ul>
           </section>
 
-          <section className="portfolio-section" id="experiments" aria-labelledby="experiments-title">
-            <h2 id="experiments-title" aria-label="Experiments">
-              <MaskedWords delay={1500} text="Experiments" />
+          <section className="portfolio-section" id="education" aria-labelledby="education-title">
+            <h2 id="education-title" aria-label="Education">
+              <MaskedWords delay={1540} text="Education" />
             </h2>
-            <ul className="entry-list experiment-list" style={motionStyle(1560, 1470)}>
-              {experiments.map((experiment, index) => (
+            <ul className="entry-list detail-list" style={motionStyle(1600, 1510)}>
+              {education.map((item, index) => (
                 <li
-                  key={experiment.title}
-                  style={motionStyle(1600 + index * 90, 1540 + index * 90)}
+                  key={`${item.institution}-${item.credential}`}
+                  style={motionStyle(1620 + index * 90, 1580 + index * 90)}
                 >
-                  <div className="entry-row entry-reveal">
+                  <div className="entry-row">
                     <span>
-                      <strong>{experiment.title}</strong>
-                      <small>{experiment.description}</small>
+                      <strong aria-label={item.institution}>
+                        <MaskedCopy delay={1620 + index * 90} text={item.institution} />
+                      </strong>
+                      <small aria-label={item.credential}>
+                        <MaskedCopy delay={1680 + index * 90} text={item.credential} />
+                      </small>
                     </span>
-                    <span className="entry-meta">{experiment.area}</span>
+                    <span className="entry-meta" aria-label={item.status}>
+                      <MaskedCopy delay={1660 + index * 90} text={item.status} />
+                    </span>
                   </div>
                 </li>
               ))}
             </ul>
           </section>
 
-          <footer className="site-footer entry-reveal" style={motionStyle(1900, 1810)}>
-            <span>{identity.name}</span>
+          <footer className="site-footer">
             <nav aria-label="Portfolio links">
-              <a href={links.github} target="_blank" rel="noreferrer">
-                GitHub <span aria-hidden="true">↗</span>
+              <a href={links.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn, opens in a new tab">
+                <MaskedCopy delay={1900} text="LinkedIn" /> <span aria-hidden="true">↗</span>
               </a>
-              <Link href="/contact">Contact</Link>
-              <a href="#main-content">Top</a>
+              <a href={links.github} target="_blank" rel="noreferrer" aria-label="GitHub, opens in a new tab">
+                <MaskedCopy delay={1960} text="GitHub" /> <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href="/Amal-I-Resume.pdf"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Resume PDF, opens in a new tab"
+              >
+                <MaskedCopy delay={2020} text="Resume" /> <span aria-hidden="true">↗</span>
+              </a>
             </nav>
           </footer>
         </article>
