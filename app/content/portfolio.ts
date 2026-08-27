@@ -22,7 +22,7 @@ export const portfolioContent = {
   identity: {
     name: "Amal E",
     role: "Full-Stack Developer & Digital Product Builder",
-    location: "Seattle, Washington",
+    location: "Seattle, WA",
     bio: [
       "I'm a self-taught developer trying to find my place in the chaos of AI and everything changing around it.",
       "I build focused full-stack web products that connect responsive interfaces with application logic, relational data, APIs, and practical AI-assisted workflows.",

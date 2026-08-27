@@ -36,7 +36,11 @@ export function OnePagePortfolio({ typeStyle = "instrument" }: { typeStyle?: Por
               {experience.map((item) => (
                 <li key={`${item.organization}-${item.role}`}>
                   <article className="experience-entry">
-                    <div className="experience-title-row">
+                    <div
+                      className={`experience-title-row${
+                        item.organization !== "Independent" ? " experience-title-row-with-company" : ""
+                      }`}
+                    >
                       <h3>{item.role}</h3>
                       {item.organization !== "Independent" ? (
                         <p className="experience-company">{item.organization}</p>

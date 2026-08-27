@@ -17,6 +17,7 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
   const closeAnimationEndRef = useRef<((event: AnimationEvent) => void) | null>(null);
   const focusFrameRef = useRef<number | null>(null);
   const closingRef = useRef(false);
+  const restoreTriggerFocusRef = useRef(true);
   const originalPageStylesRef = useRef<{
     bodyOverflow: string;
     bodyPaddingRight: string;
@@ -77,7 +78,12 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
     setIsClosing(false);
 
     focusFrameRef.current = window.requestAnimationFrame(() => {
-      triggerRef.current?.focus({ preventScroll: true });
+      if (restoreTriggerFocusRef.current) {
+        triggerRef.current?.focus({ preventScroll: true });
+      } else {
+        triggerRef.current?.blur();
+      }
+
       focusFrameRef.current = null;
     });
   };
@@ -211,6 +217,14 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         aria-label={`Open details for ${project.title}`}
+        onPointerDown={() => {
+          restoreTriggerFocusRef.current = false;
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            restoreTriggerFocusRef.current = true;
+          }
+        }}
         onClick={openDialog}
       >
         {children}
@@ -230,10 +244,15 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
           requestClose();
         }}
         onKeyDown={(event) => {
+          restoreTriggerFocusRef.current = true;
+
           if (event.key === "Escape") {
             event.preventDefault();
             requestClose();
           }
+        }}
+        onPointerDown={() => {
+          restoreTriggerFocusRef.current = false;
         }}
         onClick={(event) => {
           const rect = event.currentTarget.getBoundingClientRect();
