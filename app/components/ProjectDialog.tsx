@@ -123,7 +123,7 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
 
     closeAnimationEndRef.current = handleExitComplete;
     dialog.addEventListener("animationend", handleExitComplete);
-    closeTimerRef.current = window.setTimeout(closeImmediately, 2400);
+    closeTimerRef.current = window.setTimeout(closeImmediately, 1900);
   };
 
   const openDialog = () => {
