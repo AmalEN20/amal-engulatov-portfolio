@@ -1,47 +1,13 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
-import { Fragment, useEffect, useId, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { PortfolioProject } from "../content/portfolio";
 
 type ProjectDialogProps = {
   children: ReactNode;
   project: PortfolioProject;
 };
-
-const dialogMotionStyle = (delay: number) =>
-  ({ "--dialog-delay": `${delay}ms` } as CSSProperties);
-
-function DialogWords({
-  delay,
-  stagger = 52,
-  text,
-}: {
-  delay: number;
-  stagger?: number;
-  text: string;
-}) {
-  return text.split(" ").map((word, index, words) => (
-    <Fragment key={`${word}-${index}`}>
-      <span className="dialog-word-mask" aria-hidden="true">
-        <span className="dialog-reveal-word" style={dialogMotionStyle(delay + index * stagger)}>
-          {word}
-        </span>
-      </span>
-      {index < words.length - 1 ? " " : null}
-    </Fragment>
-  ));
-}
-
-function DialogBlock({ children, delay }: { children: ReactNode; delay: number }) {
-  return (
-    <span className="dialog-block-mask" aria-hidden="true">
-      <span className="dialog-reveal-block" style={dialogMotionStyle(delay)}>
-        {children}
-      </span>
-    </span>
-  );
-}
 
 export function ProjectDialog({ children, project }: ProjectDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -157,7 +123,7 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
 
     closeAnimationEndRef.current = handleExitComplete;
     dialog.addEventListener("animationend", handleExitComplete);
-    closeTimerRef.current = window.setTimeout(closeImmediately, 900);
+    closeTimerRef.current = window.setTimeout(closeImmediately, 1500);
   };
 
   const openDialog = () => {
@@ -263,6 +229,12 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
           event.preventDefault();
           requestClose();
         }}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            requestClose();
+          }
+        }}
         onClick={(event) => {
           const rect = event.currentTarget.getBoundingClientRect();
           const clickedOutside =
@@ -278,45 +250,36 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
         onClose={handleClosed}
       >
         <div className="project-dialog-panel">
-          <div className="project-dialog-topline">
-            <button className="project-dialog-close" type="button" onClick={requestClose}>
-              Close <span aria-hidden="true">×</span>
-            </button>
-          </div>
+          <button
+            className="project-dialog-close-visually-hidden"
+            type="button"
+            tabIndex={-1}
+            onClick={requestClose}
+          >
+            Close project details
+          </button>
 
-          <h2 id={titleId} aria-label={project.title}>
-            <DialogWords delay={220} stagger={48} text={project.title} />
-          </h2>
+          <h2 id={titleId}>{project.title}</h2>
 
-          <p className="project-dialog-summary" id={summaryId} aria-label={project.summary}>
-            <DialogBlock delay={340}>{project.summary}</DialogBlock>
+          <p className="project-dialog-summary" id={summaryId}>
+            {project.summary}
           </p>
 
           <div className="project-dialog-divider" aria-hidden="true" />
 
-          <p className="project-dialog-description" aria-label={project.description}>
-            <DialogBlock delay={450}>{project.description}</DialogBlock>
-          </p>
+          <p className="project-dialog-description">{project.description}</p>
 
           <dl className="project-dialog-details">
             <div>
-              <dt aria-label="Responsibility">
-                <DialogBlock delay={530}>Responsibility</DialogBlock>
-              </dt>
-              <dd aria-label={project.responsibility}>
-                <DialogBlock delay={580}>{project.responsibility}</DialogBlock>
-              </dd>
+              <dt>Responsibility</dt>
+              <dd>{project.responsibility}</dd>
             </div>
             <div>
-              <dt aria-label="Stack">
-                <DialogBlock delay={570}>Stack</DialogBlock>
-              </dt>
+              <dt>Stack</dt>
               <dd>
                 <ul aria-label="Technology stack">
-                  {project.stack.map((technology, index) => (
-                    <li key={technology} aria-label={technology}>
-                      <DialogBlock delay={620 + index * 38}>{technology}</DialogBlock>
-                    </li>
+                  {project.stack.map((technology) => (
+                    <li key={technology}>{technology}</li>
                   ))}
                 </ul>
               </dd>
@@ -331,14 +294,10 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
                 rel="noreferrer"
                 aria-label={`${project.websiteLabel}, opens in a new tab`}
               >
-                <DialogBlock delay={760}>
-                  {project.websiteLabel} <span aria-hidden="true">↗</span>
-                </DialogBlock>
+                {project.websiteLabel} <span aria-hidden="true">↗</span>
               </a>
             ) : (
-              <span aria-label={project.websiteLabel}>
-                <DialogBlock delay={760}>{project.websiteLabel}</DialogBlock>
-              </span>
+              <span>{project.websiteLabel}</span>
             )}
             {project.repositoryUrl ? (
               <a
@@ -347,14 +306,10 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
                 rel="noreferrer"
                 aria-label={`${project.repositoryLabel}, opens in a new tab`}
               >
-                <DialogBlock delay={820}>
-                  {project.repositoryLabel} <span aria-hidden="true">↗</span>
-                </DialogBlock>
+                {project.repositoryLabel} <span aria-hidden="true">↗</span>
               </a>
             ) : (
-              <span aria-label={project.repositoryLabel}>
-                <DialogBlock delay={820}>{project.repositoryLabel}</DialogBlock>
-              </span>
+              <span>{project.repositoryLabel}</span>
             )}
           </nav>
         </div>

@@ -39,17 +39,23 @@ export function HeavyScroll({ children }: { children: React.ReactNode }) {
         frameId = window.requestAnimationFrame(frame);
       };
 
-      if (document.documentElement.dataset.projectDialog === "open") {
+      if (
+        document.documentElement.dataset.intro === "active" ||
+        document.documentElement.dataset.projectDialog === "open"
+      ) {
         lenis.stop();
       }
 
       frameId = window.requestAnimationFrame(frame);
     };
 
-    const syncProjectDialogLock = () => {
+    const syncMotionLock = () => {
       if (!lenis) return;
 
-      if (document.documentElement.dataset.projectDialog === "open") {
+      if (
+        document.documentElement.dataset.intro === "active" ||
+        document.documentElement.dataset.projectDialog === "open"
+      ) {
         lenis.stop();
       } else {
         lenis.resize();
@@ -66,13 +72,15 @@ export function HeavyScroll({ children }: { children: React.ReactNode }) {
     finePointer.addEventListener("change", sync);
     reducedMotion.addEventListener("change", sync);
     window.addEventListener("pageshow", restoreFromPageCache);
-    window.addEventListener("amal:project-dialog-lock", syncProjectDialogLock);
+    window.addEventListener("amal:project-dialog-lock", syncMotionLock);
+    window.addEventListener("amal:site-intro-lock", syncMotionLock);
 
     return () => {
       finePointer.removeEventListener("change", sync);
       reducedMotion.removeEventListener("change", sync);
       window.removeEventListener("pageshow", restoreFromPageCache);
-      window.removeEventListener("amal:project-dialog-lock", syncProjectDialogLock);
+      window.removeEventListener("amal:project-dialog-lock", syncMotionLock);
+      window.removeEventListener("amal:site-intro-lock", syncMotionLock);
       destroy();
     };
   }, []);

@@ -8,10 +8,12 @@ import {
 import "lenis/dist/lenis.css";
 import "./globals.css";
 import { HeavyScroll } from "./components/HeavyScroll";
+import { SiteIntro } from "./components/SiteIntro";
 
 const geist = Geist({
   variable: "--font-geist",
   subsets: ["latin"],
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
@@ -22,7 +24,6 @@ const geistMono = Geist_Mono({
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
   subsets: ["latin"],
-  preload: false,
 });
 
 const ibmPlexSansCondensed = IBM_Plex_Sans_Condensed({
@@ -54,19 +55,23 @@ export const metadata: Metadata = {
   },
 };
 
+const introFailsafe = `
+  window.setTimeout(function () {
+    document.documentElement.removeAttribute("data-intro");
+    var loader = document.querySelector(".site-loader");
+    if (loader) loader.remove();
+    window.dispatchEvent(new Event("amal:site-intro-lock"));
+  }, 4200);
+`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{if(location.pathname==="/"&&!matchMedia("(prefers-reduced-motion: reduce)").matches){var n=performance.getEntriesByType("navigation")[0];var t=n&&n.type;var s=history.state||{};if(t==="reload"||!s.__amalEntryPlayed){document.documentElement.dataset.entryMotion="armed";history.replaceState(Object.assign({},s,{__amalEntryPlayed:true}),"");setTimeout(function(){delete document.documentElement.dataset.entryMotion},4100)}}}catch(e){}`,
-          }}
-        />
-      </head>
       <body
         className={`${geist.variable} ${geistMono.variable} ${instrumentSans.variable} ${ibmPlexSansCondensed.variable}`}
       >
+        <script dangerouslySetInnerHTML={{ __html: introFailsafe }} />
+        <SiteIntro />
         <HeavyScroll>{children}</HeavyScroll>
       </body>
     </html>

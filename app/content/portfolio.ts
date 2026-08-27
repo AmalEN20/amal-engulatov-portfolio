@@ -16,13 +16,16 @@ export type PortfolioProject = {
 };
 
 export const portfolioContent = {
+  preloader: {
+    line: "Passion to build something new and interesting.",
+  },
   identity: {
     name: "Amal E",
     role: "Full-Stack Developer & Digital Product Builder",
     location: "Seattle, Washington",
     bio: [
-      "I build full-stack web products that connect responsive interfaces with application logic, relational data, APIs, and practical AI-assisted workflows.",
-      "My work spans Next.js and TypeScript frontends, Cloudflare-backed services, accessible motion systems, debugging, performance, and cross-device QA.",
+      "I'm a self-taught developer trying to find my place in the chaos of AI and everything changing around it.",
+      "I build focused full-stack web products that connect responsive interfaces with application logic, relational data, APIs, and practical AI-assisted workflows.",
     ],
   },
   experience: [

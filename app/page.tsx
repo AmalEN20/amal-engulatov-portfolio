@@ -14,7 +14,7 @@ export default async function Home({
   const typeValue = Array.isArray(requestedType) ? requestedType[0] : requestedType;
   const typeStyle = typeStyles.has(typeValue as PortfolioTypeStyle)
     ? (typeValue as PortfolioTypeStyle)
-    : "geist";
+    : "instrument";
 
   return <OnePagePortfolio typeStyle={typeStyle} />;
 }
