@@ -121,12 +121,12 @@ ul {
   position: relative;
   width: calc(100% - 32px);
   margin: 0;
-  color: #111111;
+  color: #333330;
   font-family: var(--font-instrument-sans), Arial, sans-serif;
-  font-size: clamp(.88rem, 3.55vw, 2.05rem);
-  font-variation-settings: "wght" 350;
-  font-weight: 350;
-  letter-spacing: -.045em;
+  font-size: clamp(.88rem, 3vw, 1.75rem);
+  font-variation-settings: "wght" 400;
+  font-weight: 400;
+  letter-spacing: -.028em;
   line-height: 1;
   text-align: center;
   white-space: nowrap;
