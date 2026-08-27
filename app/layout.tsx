@@ -34,14 +34,19 @@ const ibmPlexSansCondensed = IBM_Plex_Sans_Condensed({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://amaleng.com"),
   title: {
     default: "Amal E — Full-Stack Developer",
     template: "%s | Amal E",
+  },
+  alternates: {
+    canonical: "/",
   },
   description:
     "Experience, selected projects, and education by Amal E, a full-stack developer and digital product builder based in Seattle, Washington.",
   openGraph: {
     type: "website",
+    url: "/",
     title: "Amal E — Full-Stack Developer",
     description:
       "Experience, selected projects, and education by full-stack developer Amal E.",
