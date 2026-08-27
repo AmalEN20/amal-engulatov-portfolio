@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { portfolioContent } from "../content/portfolio";
 
 type IntroPhase = "holding" | "text-exiting" | "curtain-exiting" | "complete";
 
@@ -11,7 +12,17 @@ export function SiteIntro() {
     const root = document.documentElement;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    root.dataset.intro = "active";
+    const setIntroLock = (active: boolean) => {
+      if (active) {
+        root.dataset.intro = "active";
+      } else {
+        delete root.dataset.intro;
+      }
+
+      window.dispatchEvent(new Event("amal:site-intro-lock"));
+    };
+
+    setIntroLock(true);
 
     const textExitTimer = window.setTimeout(
       () => setPhase("text-exiting"),
@@ -24,7 +35,7 @@ export function SiteIntro() {
     const completeTimer = window.setTimeout(
       () => {
         setPhase("complete");
-        delete root.dataset.intro;
+        setIntroLock(false);
       },
       reducedMotion ? 70 : 3020,
     );
@@ -33,19 +44,18 @@ export function SiteIntro() {
       window.clearTimeout(textExitTimer);
       window.clearTimeout(curtainExitTimer);
       window.clearTimeout(completeTimer);
-      delete root.dataset.intro;
+      setIntroLock(false);
     };
   }, []);
 
-  if (phase === "complete") return null;
+  if (phase === "complete") {
+    return null;
+  }
 
   return (
     <div className={`site-loader site-loader-${phase}`} aria-hidden="true">
       <div className="intro-curtain" />
-      <p className="loader-copy">
-        <span>Passion to build</span>
-        <strong>something cool.</strong>
-      </p>
+      <p className="loader-copy">{portfolioContent.preloader.line}</p>
     </div>
   );
 }

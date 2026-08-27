@@ -1,11 +1,30 @@
 import type { Metadata } from "next";
-import { ContactExperience } from "./ContactExperience";
+import Link from "next/link";
+import { ContactForm } from "../components/ContactForm";
 
 export const metadata: Metadata = {
-  title: "Contact | Amal Engulatov",
-  description: "Contact Amal Engulatov.",
+  title: "Contact",
+  description: "Contact Amal E about frontend or full-stack opportunities.",
 };
 
 export default function ContactPage() {
-  return <ContactExperience />;
+  return (
+    <>
+      <a className="skip-link" href="#contact-form">
+        Skip to form
+      </a>
+      <main className="utility-page" id="contact-form">
+        <Link className="utility-back" href="/">
+          ← Amal E
+        </Link>
+        <header className="utility-header">
+          <h1>Contact</h1>
+          <p>
+            For frontend or full-stack opportunities, share the role, product, or problem you are working on.
+          </p>
+        </header>
+        <ContactForm />
+      </main>
+    </>
+  );
 }

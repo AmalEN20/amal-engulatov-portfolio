@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { ProjectsExperience } from "./ProjectsExperience";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Projects",
-  description: "Selected work by Amal Engulatov: Evele Studio and Amal AI Studio.",
+  title: "Selected Work",
+  description: "Selected work by Amal E: EVELE STUDIO and Amal AI Studio.",
 };
 
 export default function ProjectsPage() {
-  return <ProjectsExperience />;
+  redirect("/#projects");
 }

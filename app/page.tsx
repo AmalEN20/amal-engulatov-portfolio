@@ -1,19 +1,20 @@
-import { HomeHero } from "./components/HomeHero";
+import {
+  OnePagePortfolio,
+  type PortfolioTypeStyle,
+} from "./components/OnePagePortfolio";
 
-const sections = [
-  { id: "about", label: "About" },
-  { id: "contact", label: "Contact" },
-] as const;
+const typeStyles = new Set<PortfolioTypeStyle>(["geist", "instrument", "plex"]);
 
-export default function Home() {
-  return (
-    <main className="site-structure">
-      <HomeHero />
-      {sections.map(({ id, label }) => (
-        <section className="structure-section" id={id} key={id} aria-label={`${label} section`}>
-          <h2>{label}</h2>
-        </section>
-      ))}
-    </main>
-  );
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string | string[] }>;
+}) {
+  const requestedType = (await searchParams).type;
+  const typeValue = Array.isArray(requestedType) ? requestedType[0] : requestedType;
+  const typeStyle = typeStyles.has(typeValue as PortfolioTypeStyle)
+    ? (typeValue as PortfolioTypeStyle)
+    : "instrument";
+
+  return <OnePagePortfolio typeStyle={typeStyle} />;
 }
