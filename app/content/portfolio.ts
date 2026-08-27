@@ -26,6 +26,7 @@ export const portfolioContent = {
     bio: [
       "I'm a self-taught developer trying to find my place in the chaos of AI and everything changing around it.",
       "I build focused full-stack web products that connect responsive interfaces with application logic, relational data, APIs, and practical AI-assisted workflows.",
+      "I'm drawn to difficult challenges—building things I can't fully imagine at the start and learning my way toward them.",
     ],
   },
   experience: [
@@ -67,7 +68,7 @@ export const portfolioContent = {
     },
     {
       slug: "amal-ai-studio",
-      title: "Amal AI Studio",
+      title: "AI CLIENT SEARCH SYSTEM",
       responsibility: "Client-acquisition OS / Full-stack development",
       category: "Client acquisition OS / Full-stack development",
       summary:
@@ -80,7 +81,7 @@ export const portfolioContent = {
       repositoryUrl: "https://github.com/AmalEN20/amal-ai-studio",
       repositoryLabel: "View source code",
       imageSrc: "/projects/amal-ai-studio-dashboard.png",
-      imageAlt: "Amal AI Studio dashboard showing a client research pipeline",
+      imageAlt: "AI Client Search System dashboard showing a client research pipeline",
       year: "2026",
     },
   ] satisfies readonly PortfolioProject[],
