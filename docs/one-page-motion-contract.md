@@ -35,7 +35,7 @@ Verified actions are explicit. EVELE STUDIO exposes `https://evele.studio` and l
 
 The one-page document has no page-local route exit. Anchor links are handed to the same Lenis owner on desktop and remain native on touch/reduced motion. Reverse input must respond immediately and ease without overshoot. Legacy URLs redirect to stable anchors. Back/Forward must restore the expected URL/anchor without replaying an intro or trapping focus.
 
-Project dialogs do not change routes or browser history. Escape, backdrop click, and a visually hidden assistive close control request the same finite close sequence; there is no visible Close row consuming card space. Background scrolling is locked only while a dialog is open, then restored exactly. Before Lenis restarts, the global scroll owner synchronizes its internal position to the restored native scroll coordinate, avoiding a post-close snap. Focus returns to the triggering project row after close. Repeated open/close cycles must not leave an animation listener, fail-safe timer, scroll lock, or stale focus target behind.
+Project dialogs do not change routes or browser history. Escape, backdrop click, and a visually hidden assistive close control request the same finite close sequence; there is no visible Close row consuming card space. Background scrolling is locked only while a dialog is open, then restored exactly. Before Lenis restarts, the global scroll owner synchronizes its internal position to the restored native scroll coordinate, avoiding a post-close snap. Keyboard-origin close returns focus to the triggering project row; touch/pointer close clears the trigger focus so mobile browsers do not leave a false rectangular focus frame. Repeated open/close cycles must not leave an animation listener, fail-safe timer, scroll lock, or stale focus target behind.
 
 ## 5. Layer ownership
 
@@ -53,7 +53,7 @@ Project dialogs do not change routes or browser history. Escape, backdrop click,
 
 - Desktop 1440×900: a compact 600px reading column and a reduced frameless pixel silhouette fixed to the bottom-right viewport edge, balanced as visual masses with a narrower inter-column gap.
 - Responsive breakpoint: the visual exists at `1100px` and above; at `1099px` and below it is completely removed, matching the measured Lee breakpoint.
-- Mobile 390×844 and 430×932: no portrait or portrait placeholder; content uses 20px side padding, native touch scroll, at least 44px interactive targets, and the same single document-level entry while preserving the word-mask grammar.
+- Mobile 390×844 and 430×932: no portrait or portrait placeholder; content uses 20px side padding, native touch scroll, at least 44px interactive targets, and the same single document-level entry while preserving the word-mask grammar. Native OS momentum is intentional: the desktop Lenis wheel curve is not applied to touch because it would compete with direct finger control, browser chrome, overscroll, and accessibility gestures.
 - Project dialogs: centered and comfortably inset on desktop; on mobile they retain a visible page margin, use the deliberately slower 1180ms curtain in both directions, start the backdrop fade only in the curtain's final 280ms, and cap their internal height below the viewport rather than becoming full-screen.
 - Reduced motion: the preloader is skipped, Lenis is never created, the portrait renders one static Canvas frame without a continuous RAF, all document and dialog content is immediately visible, and dialogs open/close without decorative delay.
 
@@ -77,6 +77,8 @@ Budget: one Lenis instance/RAF for desktop wheel plus one visible portrait RAF; 
 - Content remains visible with JavaScript disabled and after simulated hydration failure.
 - No clipped descenders at entry end; long words wrap safely at 390px and 430px.
 - Introduction, Experience, Projects, and Education appear in that order with no Bio label, availability line, Notes, or numeric labels.
+- At 390px and 430px, the role and `Seattle, WA` metadata each remain on one line; the first Experience heading reads as one compact `Software Engineer — IHealth and Wellness Foundation` line in a shared type style, while desktop keeps the company aligned to the right.
+- Closing a project after a touch/pointer interaction clears the trigger focus ring; keyboard opening or Escape-close restores visible focus to the same project trigger.
 - Cold load and refresh render the white preloader with one unwrapped, restrained near-black message in the portfolio's Instrument Sans system, then preserve the approved hold, shared surface-and-message curtain exit, and final removal; the message never fades independently or remains outside the white surface.
 - Every page text fragment and divider is in its final state beneath the preloader and remains static after reveal; below-fold content never waits for scroll.
 - Desktop wheel decelerates without delaying the initial response; touch and reduced motion stay native.
@@ -85,7 +87,7 @@ Budget: one Lenis instance/RAF for desktop wheel plus one visible portrait RAF; 
 - Every visible horizontal divider reaches full width without overshoot or a one-pixel final gap.
 - Hover and `:focus-visible` feedback are visible; keyboard order follows document order.
 - The final divider and repeated `Amal E` label are absent; footer actions start immediately after Education.
-- IHealth aligns to the right of `Software Engineer`; `Independent` is not rendered above the freelance role, including at 390px and 430px.
+- IHealth aligns to the right of `Software Engineer` on desktop and follows it through an inline dash at 390px and 430px; `Independent` is not rendered above the freelance role.
 - Geist, Instrument, and Plex preview URLs preserve content order, masks, dialog typography, focus targets, and zero horizontal overflow; the default `/` and invalid query values render Instrument Sans.
 - At the dialog's 5%, 50%, and 95% stopped frames, every visible title/copy/dot/rule is revealed only by the white panel's single clip; no child animation or delayed element exists.
 - Both project rows open their own verified content in a centered, non-full-screen white dialog; the backdrop is moderate, the top-down panel reveal finishes cleanly, and supporting text is never left clipped.

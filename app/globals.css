@@ -1028,19 +1028,23 @@ textarea:focus-visible {
 
   .profile-meta {
     align-items: flex-start;
+    gap: 8px;
     margin-top: 10px;
     padding-bottom: 9px;
   }
 
   .profile-meta p {
-    max-width: 245px;
-    font-size: 10px;
+    max-width: none;
+    font-size: 9px;
+    letter-spacing: .02em;
+    white-space: nowrap;
   }
 
   .profile-meta span {
-    max-width: 92px;
+    max-width: none;
     font-size: 9px;
     text-align: right;
+    white-space: nowrap;
   }
 
   .intro-copy {
@@ -1074,9 +1078,27 @@ textarea:focus-visible {
     gap: 12px;
   }
 
+  .experience-title-row-with-company {
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 0;
+    white-space: nowrap;
+  }
+
+  .experience-title-row-with-company h3,
   .experience-company {
-    max-width: 170px;
-    font-size: 8.5px;
+    max-width: none;
+    font-family: inherit;
+    font-size: clamp(11.5px, 3.1vw, 13px);
+    font-weight: 520;
+    letter-spacing: -.026em;
+    line-height: 1.35;
+    text-align: left;
+    text-transform: none;
+  }
+
+  .experience-company::before {
+    content: " — ";
   }
 
   .experience-description {
