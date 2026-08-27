@@ -109,6 +109,8 @@ ul {
   position: absolute;
   z-index: 2;
   inset: 0;
+  display: grid;
+  place-items: center;
   background: #ffffff;
   transform: translateY(0);
   transition: transform 1120ms cubic-bezier(.72, 0, .18, 1);
@@ -117,7 +119,6 @@ ul {
 
 .loader-copy {
   position: relative;
-  z-index: 3;
   width: calc(100% - 32px);
   margin: 0;
   color: #111111;
@@ -130,13 +131,6 @@ ul {
   text-align: center;
   white-space: nowrap;
   animation: loader-line-in 620ms 100ms cubic-bezier(.22, 1, .36, 1) both;
-  transition: opacity 260ms ease, transform 420ms cubic-bezier(.76, 0, .24, 1);
-}
-
-.site-loader-text-exiting .loader-copy,
-.site-loader-curtain-exiting .loader-copy {
-  opacity: 0;
-  transform: translateY(-14px);
 }
 
 .site-loader-curtain-exiting .intro-curtain {
@@ -466,6 +460,10 @@ a.entry-row:hover .entry-meta,
 }
 
 .project-dialog {
+  --project-curtain-out-duration: 1080ms;
+  --project-backdrop-out-delay: 1080ms;
+  --project-backdrop-out-duration: 700ms;
+  --project-close-sequence-duration: 1780ms;
   width: min(620px, calc(100vw - 40px));
   max-width: none;
   max-height: min(78svh, 720px);
@@ -490,11 +488,13 @@ a.entry-row:hover .entry-meta,
 }
 
 .project-dialog[data-closing="true"] {
-  animation: project-curtain-out 1080ms cubic-bezier(.8, 0, .58, 1) both;
+  animation:
+    project-curtain-out var(--project-curtain-out-duration) cubic-bezier(.8, 0, .58, 1) both,
+    project-close-sequence var(--project-close-sequence-duration) linear both;
 }
 
 .project-dialog[data-closing="true"]::backdrop {
-  animation: project-backdrop-out 880ms cubic-bezier(.55, 0, .45, 1) both;
+  animation: project-backdrop-out var(--project-backdrop-out-duration) cubic-bezier(.55, 0, .45, 1) var(--project-backdrop-out-delay) both;
 }
 
 .project-dialog-panel {
@@ -975,6 +975,13 @@ textarea:focus-visible {
   }
 }
 
+@keyframes project-close-sequence {
+  from,
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes project-backdrop-in {
   from {
     background: rgb(17 17 17 / 0%);
@@ -1105,15 +1112,14 @@ textarea:focus-visible {
   }
 
   .project-dialog {
+    --project-curtain-out-duration: 1180ms;
+    --project-backdrop-out-delay: 1180ms;
+    --project-close-sequence-duration: 1880ms;
     width: calc(100vw - 24px);
     max-height: 82svh;
   }
 
   .project-dialog[open]:not([data-closing="true"]) {
-    animation-duration: 1180ms;
-  }
-
-  .project-dialog[data-closing="true"] {
     animation-duration: 1180ms;
   }
 

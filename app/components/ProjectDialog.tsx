@@ -109,7 +109,7 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
     setIsClosing(true);
 
     const handleExitComplete = (event: AnimationEvent) => {
-      if (event.target !== dialog || event.animationName !== "project-curtain-out") {
+      if (event.target !== dialog || event.animationName !== "project-close-sequence") {
         return;
       }
 
@@ -123,7 +123,7 @@ export function ProjectDialog({ children, project }: ProjectDialogProps) {
 
     closeAnimationEndRef.current = handleExitComplete;
     dialog.addEventListener("animationend", handleExitComplete);
-    closeTimerRef.current = window.setTimeout(closeImmediately, 1500);
+    closeTimerRef.current = window.setTimeout(closeImmediately, 2400);
   };
 
   const openDialog = () => {

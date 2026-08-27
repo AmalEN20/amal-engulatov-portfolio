@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { portfolioContent } from "../content/portfolio";
 
-type IntroPhase = "holding" | "text-exiting" | "curtain-exiting" | "complete";
+type IntroPhase = "holding" | "curtain-exiting" | "complete";
 
 export function SiteIntro() {
   const [phase, setPhase] = useState<IntroPhase>("holding");
@@ -24,13 +24,9 @@ export function SiteIntro() {
 
     setIntroLock(true);
 
-    const textExitTimer = window.setTimeout(
-      () => setPhase("text-exiting"),
-      reducedMotion ? 10 : 1250,
-    );
     const curtainExitTimer = window.setTimeout(
       () => setPhase("curtain-exiting"),
-      reducedMotion ? 20 : 1780,
+      reducedMotion ? 10 : 1780,
     );
     const completeTimer = window.setTimeout(
       () => {
@@ -41,7 +37,6 @@ export function SiteIntro() {
     );
 
     return () => {
-      window.clearTimeout(textExitTimer);
       window.clearTimeout(curtainExitTimer);
       window.clearTimeout(completeTimer);
       setIntroLock(false);
@@ -54,8 +49,9 @@ export function SiteIntro() {
 
   return (
     <div className={`site-loader site-loader-${phase}`} aria-hidden="true">
-      <div className="intro-curtain" />
-      <p className="loader-copy">{portfolioContent.preloader.line}</p>
+      <div className="intro-curtain">
+        <p className="loader-copy">{portfolioContent.preloader.line}</p>
+      </div>
     </div>
   );
 }
