@@ -26,14 +26,14 @@ export function SiteIntro() {
 
     const curtainExitTimer = window.setTimeout(
       () => setPhase("curtain-exiting"),
-      reducedMotion ? 10 : 1780,
+      reducedMotion ? 10 : 1650,
     );
     const completeTimer = window.setTimeout(
       () => {
         setPhase("complete");
         setIntroLock(false);
       },
-      reducedMotion ? 70 : 3020,
+      reducedMotion ? 70 : 2850,
     );
 
     return () => {

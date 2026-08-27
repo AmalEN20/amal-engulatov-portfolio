@@ -461,9 +461,9 @@ a.entry-row:hover .entry-meta,
 
 .project-dialog {
   --project-curtain-out-duration: 1080ms;
-  --project-backdrop-out-delay: 1080ms;
-  --project-backdrop-out-duration: 700ms;
-  --project-close-sequence-duration: 1780ms;
+  --project-backdrop-out-delay: 820ms;
+  --project-backdrop-out-duration: 560ms;
+  --project-close-sequence-duration: 1380ms;
   width: min(620px, calc(100vw - 40px));
   max-width: none;
   max-height: min(78svh, 720px);
@@ -1113,8 +1113,8 @@ textarea:focus-visible {
 
   .project-dialog {
     --project-curtain-out-duration: 1180ms;
-    --project-backdrop-out-delay: 1180ms;
-    --project-close-sequence-duration: 1880ms;
+    --project-backdrop-out-delay: 900ms;
+    --project-close-sequence-duration: 1460ms;
     width: calc(100vw - 24px);
     max-height: 82svh;
   }
